@@ -1,9 +1,9 @@
 name: CI
 
+# Temporarily disabled for automatic CI/CD.
+# Restore the pull_request and push triggers when CI/CD should resume.
 on:
-  pull_request:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 jobs:
   backend-test:
