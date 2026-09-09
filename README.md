@@ -2,7 +2,7 @@
 
 > Find your next hike. Find your people.
 
-The DAPYO is a free social platform for discovering, organizing,
+DAPYO is a free social platform for discovering, organizing,
 and joining hikes with other people. It connects hikers, organizers, trails,
 scheduled events, activity history, reputation, and lightweight gamification
 in one place.
