@@ -1,8 +1,8 @@
-# Hiking Social App
+# DAPYO
 
 > Find your next hike. Find your people.
 
-The Hiking Social App is a free social platform for discovering, organizing,
+The DAPYO is a free social platform for discovering, organizing,
 and joining hikes with other people. It connects hikers, organizers, trails,
 scheduled events, activity history, reputation, and lightweight gamification
 in one place.
@@ -49,7 +49,7 @@ businesses are future users, not part of the initial product scope.
 | Strava | Activity tracking |
 | AllTrails | Trail discovery |
 | Komoot | Route planning |
-| **Hiking Social App** | **Scheduled hiking and social participation** |
+| **DAPYO** | **Scheduled hiking and social participation** |
 
 The product owns the space between “I want to hike” and “I completed a hike”:
 discovery, scheduling, joining, group coordination, and trusted participation.
