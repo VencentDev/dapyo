@@ -1,292 +1,232 @@
-# MVP
+# Mobile MVP Decision
 
-## MVP Goal
+- **Status:** Approved product scope
+- **Date:** 2026-09-14
+- **Primary product:** Flutter mobile app
+- **Related specification:** [Formal mobile MVP ticket specification](../superpowers/specs/2026-09-14-hiking-mobile-mvp-ticket-spec.md)
+- **Next.js:** Reserved for a future landing page; not part of this MVP
 
-The MVP should answer one critical question:
+## MVP goal
 
-> **Will hikers use the application to discover and join hikes with other people?**
+The MVP should answer one question:
 
-Do not attempt to build the complete hiking ecosystem in version 1.
+> **Will hikers use the app to discover, organize, join, complete, and repeat hikes with other people?**
 
----
-
-# MVP Features
-
-The MVP and its core social features are totally free. Do not add pricing,
-subscriptions, premium tiers, or payment flows.
-
-## 1. Authentication
-
-- Email authentication.
-- Google / Apple authentication.
-- Profile creation.
-
-### Profile
+The core loop is:
 
 ```text
-Name
-Profile photo
-Bio
-Location
-Experience level
-Preferred difficulty
+DISCOVER → JOIN OR CREATE → COMMUNICATE → HIKE → TRACK OFFLINE
+→ COMPLETE → EARN → SHARE → REPEAT
 ```
 
----
+The primary value is scheduled social participation. GPS tracking supports the
+experience but does not replace the event and community loop.
 
-## 2. Mountain / Trail Database
+## Platform and access decisions
 
-Basic structured information:
+- The initial product is a Flutter mobile app for Android and iOS.
+- Visitors can browse public upcoming hikes without an account.
+- Authentication is required to join, create, sync, earn rewards, or share.
+- Mobile authentication supports Google and Apple only.
+- Every authenticated user can both join hikes and create hikes.
+- All hikes are public in the MVP.
+- Core features are free; no payments, subscriptions, or marketplace flows.
 
-```text
-Mountain
+## Profile and onboarding
+
+Required profile fields:
+
 - Name
 - Location
-- Elevation
+- Experience level
+- Preferred difficulty
+
+Optional analytics fields:
+
+- How the user found the app
+- Age or age range
+- Other demographic information that has a documented analytical purpose
+
+Analytics fields must be optional, clearly explained, consented to, excluded from
+public profiles, and usable only for aggregate product analysis.
+
+## Discover hikes
+
+The Discover screen opens with a list/card view. An optional map view shows the
+same public hikes as pins.
+
+Hike cards and details include:
+
+- Destination name
+- One map pin representing the destination and meeting location
+- Date and start time
 - Difficulty
+- Host profile
+- Current app participant profiles
+- External guest count
+- Available app slots
+- Description and requirements
+- Join action
+
+Users can filter by date, distance, location, difficulty, and available slots.
+
+Hikes may use a location from the trail database or a custom map pin.
+
+## Create and manage hikes
+
+Every user can create a public hike through this wizard:
+
+```text
+Location → Date/time → Capacity → Details → Review/publish
+```
+
+Create fields:
+
+- Location or custom map pin
+- Date and time
+- Difficulty
+- Maximum participants
+- External guest count
 - Description
-- Basic trail information
-```
+- Requirements
 
-Do not build advanced navigation initially.
+External guests are friends who will attend but do not have app accounts. They:
 
----
+- Count toward the maximum capacity.
+- Do not require profiles.
+- Do not access chat.
+- Appear as a count, not as named participants.
 
-## 3. Create Hiking Event
-
-Organizer can create:
-
-```text
-Mountain
-Date
-Start time
-Meeting point
-Difficulty
-Maximum participants
-Description
-Requirements
-```
-
-Example:
+Capacity is calculated as:
 
 ```text
-Mt. Daraitan
-
-September 20
-5:00 AM
-
-Difficulty:
-Moderate
-
-Participants:
-8 / 10
-
-Meeting point:
-Tanay
-
-Requirements:
-- Hiking experience preferred
-- Bring sufficient water
+available app slots = maximum participants
+                     - external guests
+                     - joined app participants
 ```
 
----
+The host does not consume an app-member slot in the current product decision.
 
-## 4. Discover Hikes
+Hosts can:
 
-Home / Discover screen:
-
-```text
-Upcoming Hikes
-
-Mt. Daraitan
-Sept 20
-8 / 10 participants
-Moderate
-
-[JOIN]
-
-----------------
-
-Mt. Ulap
-Sept 21
-5 / 15 participants
-Hard
-
-[JOIN]
-```
-
-### Filters
-
-- Date.
-- Distance.
-- Location.
-- Difficulty.
-- Available slots.
-
----
-
-## 5. Join / Leave Hike
-
-Users can:
-
-- Join.
-- Leave.
-- See available slots.
-- See participant list.
-
-Organizer can:
-
-- View participants.
+- View participant profiles.
 - Remove participants.
-- Cancel event.
+- Edit published hike details.
+- Delete a hike if nobody has joined.
+- Cancel a hike if participants have joined.
 
----
+Significant edits notify joined participants. A cancelled hike with participants
+is retained in history and notifications are sent. A cancelled empty hike can be
+deleted permanently.
 
-## 6. Hiking Event Chat
+There is no waitlist in the MVP. Full hikes reject additional joins.
 
-Each event gets a basic discussion area.
+## Joining and communication
 
-Example:
+- Joining is immediate while a slot is available.
+- Users can leave a joined hike.
+- The host is included in the hike group automatically.
+- Joined app participants and the host can use the hike chat.
+- Chat is completely unavailable to visitors, unjoined users, removed users,
+  and external guests.
 
-```text
-Mt. Daraitan — Sept 20
+My Hikes contains two tabs:
 
-Juan:
-Meet at 4:30 AM.
+- Upcoming
+- Completed
 
-Maria:
-I'll bring extra water.
+Completed status is derived from a past scheduled hike or a linked completed
+activity; the host does not need to close the event manually.
 
-Pedro:
-Can someone pick me up?
-```
+## Offline activity tracking
 
-Keep this simple in MVP.
+The Activity tab provides a standalone tracker. A user can start tracking even
+when they have not joined an app hike.
 
----
+The tracker must:
 
-## 7. Activity Completion
+- Start, pause, resume, and stop.
+- Record GPS points locally without cellular data.
+- Survive temporary connectivity loss and app restart.
+- Calculate distance, duration, elevation, and route locally.
+- Store a completed report offline.
+- Sync automatically when connectivity returns.
+- Retry safely without creating duplicates.
 
-After the hike, users can record:
+GPS does not require cellular signal. Map tiles do, so the app should cache the
+relevant map area before a hike when the user wants to view the route offline.
 
-```text
-Distance
-Duration
-Elevation
-Photos
-```
+The activity report shows:
 
-Manual activity entry is acceptable for MVP.
+- Route line
+- Distance — required
+- Duration — required
+- Elevation — required
+- Photos — optional
+- Notes — optional
 
-GPS tracking can come later.
+If GPS data is incomplete or inaccurate, users can correct the required metrics
+before saving. A standalone activity may later be linked to a joined hike, but
+it remains valid without one.
 
----
+## Progress and social sharing
 
-## 8. User Profile
+Both event-based and standalone completed activities can:
 
-Example:
+- Award XP.
+- Advance the user's level.
+- Unlock basic badges.
+- Be optionally shared to the Activity feed.
 
-```text
-Juan
+Shared posts can contain route summary, distance, duration, elevation, optional
+photos, and optional notes. Other users can like and comment. Sharing is always
+opt-in; unshared activity routes remain private.
 
-🥾 12 Hikes
-🏔️ 8 Mountains
-📍 67 km
+## Notifications
 
-Achievements
+The MVP includes an in-app notification center and push notifications for:
 
-🏔️ First Summit
-🥾 10 Hikes
-🌅 Sunrise Hunter
+- Someone joined or left a hike.
+- A hike was updated.
+- A hike was cancelled.
+- A hike reminder is due.
+- A new chat message was sent.
+- Someone liked or commented on a shared activity.
 
-Recent Hikes
+The in-app notification is the source of truth. Push delivery failure must not
+remove the in-app notification.
 
-Mt. Daraitan
-Mt. Ulap
-Mt. Batulao
-```
+## Parallel safety and administration workstream
 
----
+Because the product connects strangers, the MVP launch work must also cover the
+existing trust requirements:
 
-## 9. Basic Gamification
+- User reporting
+- User blocking
+- Event reporting
+- Organizer profile and basic reputation
+- Attendance history
+- Admin moderation
+- User, hike, mountain, report, organizer, review, and ban management
 
-MVP should include only:
+These items are retained as a parallel launch workstream. They are not included
+in the current core feature-ticket sequence and must be ticketed before a broad
+public launch.
 
-- XP.
-- Levels.
-- Basic badges.
+## Explicitly out of core MVP scope
 
-Example:
+- Email/password authentication
+- Friends-only or private hikes
+- Waitlists
+- GPS navigation or turn-by-turn directions
+- Live location sharing
+- Emergency dispatch, SOS, or guaranteed emergency response
+- External guest accounts
+- Payments, subscriptions, or marketplace features
+- Wearable integrations
+- AI hiking assistant
+- Complex recommendation engine
+- Advanced route analytics or leaderboards
 
-```text
-Level 7
-Mountain Explorer
-
-XP
-1,240 / 1,500
-```
-
----
-
-## 10. Basic Social Feed
-
-Completed hikes can create posts:
-
-> Juan completed Mt. Daraitan 🏔️
-
-> 8.4 km • 4h 32m
-
-Other users can:
-
-- Like.
-- Comment.
-
----
-
-## 11. Notifications
-
-Essential notifications:
-
-- Someone joined your hike.
-- Someone left your hike.
-- Hike is tomorrow.
-- Organizer updated hike.
-- Someone commented.
-- Hike was cancelled.
-
----
-
-## 12. Admin Panel
-
-Required from the beginning.
-
-Admin should manage:
-
-- Users.
-- Hikes.
-- Mountains.
-- Reports.
-- Organizers.
-- Reviews.
-- Banned users.
-- Moderation.
-
----
-
-# Explicitly Out of MVP
-
-Do NOT initially build:
-
-- Live GPS tracking.
-- Offline maps.
-- Advanced navigation.
-- Commercial transactions.
-- Marketplace.
-- Emergency dispatch.
-- Wearable integrations.
-- AI hiking assistant.
-- Complex recommendation engine.
-- Hundreds of achievements.
-- Advanced route analytics.
-
-These should be validated after the core loop works.
+The complete implementation breakdown, API boundaries, data models, and test
+scenarios are maintained in the [formal ticket specification](../superpowers/specs/2026-09-14-hiking-mobile-mvp-ticket-spec.md).
