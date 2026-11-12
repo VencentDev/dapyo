@@ -1,9 +1,10 @@
 export const siteConfig = {
-  name: 'Mono Repo',
-  navName: 'Mono Repo',
-  metadataTitle: 'Mono Repo - Neural substrate access',
-  metadataDescription: 'Minimalist futuristic auth experience for Mono Repo.',
-  loginDescription: 'Sign in to Mono Repo to access the neural substrate.',
-  signupDescription: 'Create your Mono Repo account and initialize your decentralized identity.',
-  emailPlaceholder: 'name@monorepo.dev',
+  name: 'DAPYO',
+  navName: 'DAPYO',
+  metadataTitle: 'DAPYO — Find your next hike. Find your people.',
+  metadataDescription:
+    'Discover scheduled hikes, meet reliable people, and make the next trail part of your story.',
+  loginDescription: 'Sign in to DAPYO and find your next trail crew.',
+  signupDescription: 'Create your DAPYO account and start hiking with your people.',
+  emailPlaceholder: 'you@example.com',
 } as const;

@@ -4,27 +4,27 @@
 
 @layer base {
   :root {
-    --background: 0.985 0.006 285;
-    --foreground: 0.18 0.012 285;
-    --card: 1 0 0;
-    --card-foreground: 0.18 0.012 285;
+    --background: 0.97 0.012 150;
+    --foreground: 0.23 0.04 165;
+    --card: 0.99 0.004 150;
+    --card-foreground: 0.23 0.04 165;
     --popover: 1 0 0;
     --popover-foreground: 0.18 0.012 285;
-    --primary: 0.62 0.19 280;
-    --primary-foreground: 0.985 0.006 285;
-    --secondary: 0.94 0.012 285;
-    --secondary-foreground: 0.22 0.014 285;
-    --muted: 0.94 0.012 285;
-    --muted-foreground: 0.48 0.018 285;
-    --accent: 0.62 0.19 280;
-    --accent-alt: 0.65 0.24 305;
-    --accent-foreground: 0.985 0.006 285;
+    --primary: 0.68 0.13 75;
+    --primary-foreground: 0.23 0.04 165;
+    --secondary: 0.92 0.025 150;
+    --secondary-foreground: 0.23 0.04 165;
+    --muted: 0.92 0.025 150;
+    --muted-foreground: 0.48 0.035 165;
+    --accent: 0.38 0.09 165;
+    --accent-alt: 0.68 0.13 75;
+    --accent-foreground: 0.985 0.006 150;
     --destructive: 0.6 0.22 25;
     --destructive-foreground: 0.985 0.006 285;
-    --border: 0.86 0.012 285;
-    --input: 0.86 0.012 285;
-    --ring: 0.62 0.19 280;
-    --radius: 0.625rem;
+    --border: 0.86 0.025 150;
+    --input: 0.86 0.025 150;
+    --ring: 0.38 0.09 165;
+    --radius: 0.5rem;
     --color-background: oklch(var(--background));
     --color-foreground: oklch(var(--foreground));
     --color-card: oklch(var(--card));
@@ -37,35 +37,35 @@
   }
 
   .dark {
-    --background: 0.145 0.005 285;
-    --foreground: 0.985 0 0;
-    --card: 0 0 0;
-    --card-foreground: 0.985 0 0;
-    --popover: 0.18 0.006 285;
-    --popover-foreground: 0.985 0 0;
-    --primary: 0.62 0.19 280;
-    --primary-foreground: 0.985 0 0;
-    --secondary: 0.24 0.01 285;
-    --secondary-foreground: 0.985 0 0;
-    --muted: 0.22 0.009 285;
-    --muted-foreground: 0.55 0.012 285;
-    --accent: 0.62 0.19 280;
-    --accent-alt: 0.65 0.24 305;
-    --accent-foreground: 0.985 0 0;
+    --background: 0.16 0.03 165;
+    --foreground: 0.94 0.025 150;
+    --card: 0.2 0.035 165;
+    --card-foreground: 0.94 0.025 150;
+    --popover: 0.2 0.035 165;
+    --popover-foreground: 0.94 0.025 150;
+    --primary: 0.72 0.13 75;
+    --primary-foreground: 0.18 0.03 165;
+    --secondary: 0.25 0.04 165;
+    --secondary-foreground: 0.94 0.025 150;
+    --muted: 0.25 0.04 165;
+    --muted-foreground: 0.7 0.035 150;
+    --accent: 0.55 0.12 165;
+    --accent-alt: 0.72 0.13 75;
+    --accent-foreground: 0.94 0.025 150;
     --destructive: 0.6 0.22 25;
     --destructive-foreground: 0.985 0 0;
-    --border: 0.27 0.008 285;
-    --input: 0.27 0.008 285;
-    --ring: 0.62 0.19 280;
+    --border: 0.35 0.04 165;
+    --input: 0.35 0.04 165;
+    --ring: 0.72 0.13 75;
     --color-background: oklch(var(--background));
     --color-foreground: oklch(var(--foreground));
     --color-card: oklch(var(--card));
     --color-border: oklch(var(--border));
     --color-accent: oklch(var(--accent));
     --color-accent-alt: oklch(var(--accent-alt));
-    --field-background: color-mix(in oklab, white 5%, transparent);
-    --field-background-focus: color-mix(in oklab, white 8%, transparent);
-    --field-placeholder: oklch(0.45 0 0);
+    --field-background: color-mix(in oklab, white 8%, transparent);
+    --field-background-focus: color-mix(in oklab, white 12%, transparent);
+    --field-placeholder: oklch(0.72 0.02 150);
   }
 
   * {
@@ -75,13 +75,224 @@
   body {
     @apply overflow-x-clip bg-background text-foreground antialiased;
   }
+
+  body:has([data-auth-page]) header {
+    display: none;
+  }
+}
+
+@layer components {
+  .home-snap {
+    scroll-snap-type: y proximity;
+    scroll-behavior: smooth;
+  }
+
+  .home-snap-section {
+    scroll-snap-align: start;
+  }
+
+  .full-bleed {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+  }
+
+  .landing-container {
+    width: 100%;
+    padding-inline: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .landing-container {
+      padding-inline: 1.75rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .landing-container {
+      padding-inline: 5rem;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .landing-container {
+      padding-inline: 12.5rem;
+    }
+  }
+
+  .section-kicker {
+    @apply font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-[#668077];
+  }
+
+  .section-title {
+    @apply text-4xl font-semibold leading-[1.02] tracking-[-0.045em] sm:text-5xl;
+  }
+
+  .hero-kicker {
+    animation: hero-kicker-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .hero-title-character {
+    opacity: 0;
+    animation: hero-title-cover 0.72s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .hero-follow-up {
+    opacity: 0;
+    animation: hero-follow-up 0.8s 1.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .feature-card-reveal {
+    opacity: 0;
+    transform: translateY(1.25rem);
+    transition:
+      opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) var(--card-delay, 0ms),
+      transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) var(--card-delay, 0ms);
+  }
+
+  .feature-card-reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .story-step {
+    opacity: 0;
+    transform: translateX(2rem);
+    transition:
+      opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) var(--story-delay, 0ms),
+      transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) var(--story-delay, 0ms);
+  }
+
+  .story-step.is-visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .story-image-card {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border: 1px solid color-mix(in oklab, white 18%, transparent);
+    border-radius: 8px;
+    box-shadow: 0 1.5rem 3rem color-mix(in oklab, black 24%, transparent);
+    opacity: 0;
+    transition:
+      opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) var(--story-delay, 0ms),
+      transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) var(--story-delay, 0ms);
+  }
+
+  .story-image-card-1 {
+    z-index: 1;
+    transform: translateY(5rem) scale(0.94);
+  }
+
+  .story-image-card-2 {
+    z-index: 2;
+    transform: translateY(5rem) scale(0.94);
+  }
+
+  .story-image-card-3 {
+    z-index: 3;
+    transform: translateY(5rem) scale(0.94);
+  }
+
+  .story-image-card-1.is-visible {
+    opacity: 1;
+    transform: translate(-2.25rem, 1.5rem) rotate(-2deg);
+  }
+
+  .story-image-card-2.is-visible {
+    opacity: 1;
+    transform: translate(0, 0) rotate(1deg);
+  }
+
+  .story-image-card-3.is-visible {
+    opacity: 1;
+    transform: translate(2.25rem, -1.5rem) rotate(-1deg);
+  }
+
+  @media (max-width: 639px) {
+    .story-image-card-1.is-visible {
+      transform: translate(-1rem, 0.75rem) rotate(-2deg);
+    }
+
+    .story-image-card-3.is-visible {
+      transform: translate(1rem, -0.75rem) rotate(-1deg);
+    }
+  }
+
+  @keyframes hero-kicker-in {
+    from {
+      opacity: 0;
+      transform: translateX(-2rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes hero-title-cover {
+    from {
+      opacity: 0;
+      clip-path: inset(0 100% 0 0);
+      transform: translateY(0.2em);
+    }
+    to {
+      opacity: 1;
+      clip-path: inset(0 0 0 0);
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes hero-follow-up {
+    from {
+      opacity: 0;
+      transform: translateY(1.25rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes field-shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    25% {
+      transform: translateX(-4px);
+    }
+    75% {
+      transform: translateX(4px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .home-snap {
+      scroll-behavior: auto;
+    }
+
+    .hero-kicker,
+    .hero-title-character,
+    .hero-follow-up,
+    .feature-card-reveal,
+    .story-step,
+    .story-image-card {
+      animation: none;
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
 }
 
 @layer components {
   .field-input {
     width: 100%;
     border: 1px solid var(--color-border);
-    border-radius: 0.5rem;
+    border-radius: 8px;
     background-color: var(--field-background);
     padding: 0.625rem 1rem;
     color: var(--color-foreground);
