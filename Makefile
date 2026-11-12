@@ -1,7 +1,6 @@
 .PHONY: dev infra seed reset backend-dev spring-dev backend-test backend-build down mobile-gen mobile-run mobile-test
 
 dev:
-	docker compose -f infra/docker-compose.yml up -d
 	pnpm turbo run dev
 
 infra:
