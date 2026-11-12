@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 
-export function ThemeToggle() {
+export function ThemeToggle({ className }: { className?: string }) {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const nextTheme = resolvedTheme === 'dark' ? 'light' : 'dark';
@@ -21,6 +21,7 @@ export function ThemeToggle() {
       title="Toggle theme"
       size="icon"
       variant="ghost"
+      className={className}
       disabled={!mounted}
       onClick={() => setTheme(nextTheme)}
     >

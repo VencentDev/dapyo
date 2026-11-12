@@ -1,7 +1,8 @@
 'use client';
 
-import { Github } from 'lucide-react';
 import { signIn } from 'next-auth/react';
+import { useState } from 'react';
+import { Loader2 } from 'lucide-react';
 
 import { authProviders } from '@/lib/auth-providers';
 
@@ -9,26 +10,29 @@ type OAuthButtonsProps = {
   callbackUrl?: string;
 };
 
-export function OAuthButtons({ callbackUrl = '/todos' }: OAuthButtonsProps) {
+export function OAuthButtons({ callbackUrl = '/' }: OAuthButtonsProps) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  function handleGoogleSignIn() {
+    setIsLoading(true);
+    void signIn(authProviders.google, { redirectTo: callbackUrl });
+    window.setTimeout(() => setIsLoading(false), 1200);
+  }
+
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <div>
       <button
         type="button"
-        className="group flex items-center justify-center gap-2 rounded-lg border border-border bg-foreground/5 py-2 transition-all duration-300 hover:border-accent/40 hover:bg-foreground/10 disabled:cursor-not-allowed disabled:opacity-50"
-        disabled={!callbackUrl}
-        onClick={() => void signIn(authProviders.google, { redirectTo: callbackUrl })}
+        className="group flex w-full items-center justify-center gap-2 rounded-[8px] border border-[#cbd8d0] bg-white/70 py-3 text-sm font-semibold text-[#17342e] transition-all duration-300 hover:border-[#1d604c] hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+        disabled={!callbackUrl || isLoading}
+        onClick={handleGoogleSignIn}
       >
-        <GoogleIcon className="size-4 text-foreground transition-transform duration-300 group-hover:scale-110" />
-        <span className="text-xs font-medium">Google</span>
-      </button>
-      <button
-        type="button"
-        className="group flex items-center justify-center gap-2 rounded-lg border border-border bg-foreground/5 py-2 transition-all duration-300 hover:border-accent/40 hover:bg-foreground/10 disabled:cursor-not-allowed disabled:opacity-50"
-        disabled={!callbackUrl}
-        onClick={() => void signIn(authProviders.github, { redirectTo: callbackUrl })}
-      >
-        <Github className="size-4 text-foreground transition-transform duration-300 group-hover:scale-110" />
-        <span className="text-xs font-medium">GitHub</span>
+        {isLoading ? (
+          <Loader2 className="size-4 animate-spin" />
+        ) : (
+          <GoogleIcon className="size-4 transition-transform duration-300 group-hover:scale-110" />
+        )}
+        <span>{isLoading ? 'Connecting…' : 'Continue with Google'}</span>
       </button>
     </div>
   );

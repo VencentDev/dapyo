@@ -43,7 +43,9 @@ public class SecurityConfig {
                         "/v3/api-docs",
                         "/v3/api-docs/**",
                         "/swagger-ui.html",
-                        "/swagger-ui/**")
+                        "/swagger-ui/**",
+                        "/api/v1/auth/login",
+                        "/api/v1/auth/register")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
