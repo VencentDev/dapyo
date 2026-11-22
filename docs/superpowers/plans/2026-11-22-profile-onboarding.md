@@ -20,6 +20,7 @@
 - Existing accounts are marked complete by migration and are not prompted.
 - Keep OAuth bearer authentication working while adding DAPYO-signed credentials API tokens.
 - Keep signing secrets in runtime configuration, never in source control.
+- The test profile may use a fixed, non-production signing key; production and local runtime profiles require an externally configured key.
 
 ## Review Focus
 
@@ -38,7 +39,7 @@
 - Create `apps/backend/src/main/java/com/vencentdev/backend/modules/auth/config/ApiTokenProperties.java` for issuer, audience, signing secret, and token lifetime.
 - Create `apps/backend/src/main/java/com/vencentdev/backend/modules/auth/service/ApiTokenService.java` for signing credentials API access tokens.
 - Create `apps/backend/src/main/java/com/vencentdev/backend/modules/auth/dto/LoginResponse.java` for the user plus access token response.
-- Modify `apps/backend/src/main/resources/application.yml` and `apps/backend/.env.example` for required runtime JWT settings.
+- Modify `apps/backend/src/main/resources/application.yml`, `apps/backend/src/main/resources/application-test.yml`, and `apps/backend/.env.example` for runtime JWT settings.
 - Modify `apps/backend/src/main/java/com/vencentdev/backend/modules/auth/controller/AuthController.java`, `apps/backend/src/main/java/com/vencentdev/backend/modules/auth/oauth/OAuthProviderAuthenticationFilter.java`, and `apps/backend/src/main/java/com/vencentdev/backend/config/JwtAuthConverter.java` to issue and validate DAPYO JWTs while retaining OAuth provider resolution.
 - Modify `apps/frontend/src/lib/auth.ts` and `apps/frontend/src/types/next-auth.d.ts` to preserve a credentials-issued API token in the Auth.js JWT/session.
 
@@ -87,7 +88,7 @@
 - [x] Make the OAuth provider filter try DAPYO JWT validation first, then keep the existing Google/GitHub user-info resolution for provider tokens; reject tokens that pass neither path.
 - [x] Issue tokens for authenticated credentials users with subject `credentials:<normalized-email>` and role `USER`.
 - [x] Return the token in `LoginResponse`; update the Auth.js credentials provider to parse it and the JWT/session callbacks to retain it, while OAuth sessions keep their provider token.
-- [x] Add only placeholder/generation instructions for the required secret to `.env.example`; do not alter `.env`.
+- [x] Add secret-generation instructions to `.env.example`; keep a unique generated key in ignored local `.env` and never commit it. Give the test profile a non-production fallback key.
 
 ### Task 2: Add onboarding persistence and self-service endpoints
 
@@ -126,6 +127,7 @@
 - [x] Implement Step 2 with an initially unselected consent choice: “Share optional insights” or “Skip optional questions.” Only show age range, interests, and referral source after consent is selected; keep each answer optional.
 - [x] Use consent copy that says values are private, optional, and used only for aggregate product analysis; store consent version `onboarding-2026-11-v1` when accepted.
 - [x] On finish, submit the explicit consent choice; omit optional answers on decline; on success route to the safe callback, default `/home`.
+- [x] If a draft or completion save returns 401, send the user through re-authentication and return to the same onboarding callback.
 - [x] Restore required preferences from the server draft when an incomplete user returns; preserve entered values when navigating between steps.
 - [x] Follow existing DAPYO light/dark form styling and provide keyboard labels, visible step progress, inline errors, and focus movement to each step heading.
 
@@ -145,7 +147,7 @@
 - [x] Make OAuth buttons on signup carry the same onboarding destination; the onboarding page will immediately forward already-complete OAuth users to their callback.
 - [x] In the Home server page, redirect unauthenticated users to login as today; for authenticated users, fetch onboarding state and redirect incomplete profiles to `/onboarding?callbackUrl=%2Fhome` before rendering feed content.
 - [x] Use a shared same-origin/local-path validator for signup, login, onboarding, and completion redirects; reject external and protocol-relative callback values.
-- [x] If an onboarding API call returns 401, send the user through login with `reauth=1` and the intended local callback; the login page must show the form even when an old session exists. Allow other API errors to surface rather than silently bypassing the gate.
+- [x] If an onboarding status read or save returns 401, send the user through login with `reauth=1` and the intended local callback; the login page must show the form even when an old session exists. Allow other API errors to surface rather than silently bypassing the gate.
 
 ## Execution notes
 
@@ -153,3 +155,4 @@
 - Do not add or run tests unless the user asks to test or verify implementation.
 - Keep frontend route files thin and do not add Next.js business API routes.
 - Do not commit changes until implementation and review are complete; then commit the work in focused commits as previously requested.
+- Keep the locally generated API signing key in `apps/backend/.env`; it is ignored and must never be staged.
