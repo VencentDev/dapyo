@@ -4,6 +4,9 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { ApiError } from '@/lib/api';
+import { getOnboardingPath } from '@/lib/auth-routes';
+
 import { useSaveOnboarding } from '../api/onboarding.hooks';
 import type {
   AgeRange,
@@ -41,6 +44,15 @@ export function OnboardingForm({ initialProfile, callbackUrl }: OnboardingFormPr
   const [error, setError] = useState('');
   const save = useSaveOnboarding();
 
+  function handleSaveFailure(error: unknown, message: string) {
+    if (error instanceof ApiError && error.status === 401) {
+      const onboardingUrl = getOnboardingPath(callbackUrl);
+      router.replace(`/login?reauth=1&callbackUrl=${encodeURIComponent(onboardingUrl)}`);
+      return;
+    }
+    setError(message);
+  }
+
   useEffect(() => {
     headingRef.current?.focus();
   }, [step]);
@@ -56,8 +68,8 @@ export function OnboardingForm({ initialProfile, callbackUrl }: OnboardingFormPr
     try {
       await save.mutateAsync({ experienceLevel, preferredDifficulty });
       setStep(2);
-    } catch {
-      setError('We could not save your preferences. Please try again.');
+    } catch (error) {
+      handleSaveFailure(error, 'We could not save your preferences. Please try again.');
     }
   }
 
@@ -89,8 +101,8 @@ export function OnboardingForm({ initialProfile, callbackUrl }: OnboardingFormPr
       await save.mutateAsync(request);
       router.replace(callbackUrl);
       router.refresh();
-    } catch {
-      setError('We could not finish your profile. Please try again.');
+    } catch (error) {
+      handleSaveFailure(error, 'We could not finish your profile. Please try again.');
     }
   }
 
