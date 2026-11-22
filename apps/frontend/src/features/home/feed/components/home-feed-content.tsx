@@ -33,33 +33,35 @@ export function HomeFeedContent({ displayName }: { displayName: string }) {
 
           <section
             id="community"
-            className="mb-5 rounded-[8px] bg-white p-4 shadow-sm ring-1 ring-[#17342e]/[0.06] sm:p-5"
+            className="mb-5 rounded-[8px] bg-white p-4 shadow-sm ring-1 ring-[#17342e]/[0.06] dark:bg-[#17342e] dark:ring-white/[0.08] sm:p-5"
             aria-label="Share a hiking update"
           >
             <div className="flex items-center gap-3">
-              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#dce9df] text-sm font-bold text-[#1d604c]">
+              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#dce9df] text-sm font-bold text-[#1d604c] dark:bg-white/10 dark:text-[#dfece3]">
                 {initials}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-[#233a31]">Share a trail moment</p>
-                <p className="mt-0.5 text-xs text-[#87948c]">
+                <p className="text-sm font-semibold text-[#233a31] dark:text-white">
+                  Share a trail moment
+                </p>
+                <p className="mt-0.5 text-xs text-[#87948c] dark:text-white/55">
                   Activity sharing will appear here when it is connected.
                 </p>
               </div>
-              <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[#f6f2e9] text-[#a5743c]">
+              <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[#f6f2e9] text-[#a5743c] dark:bg-white/[0.08] dark:text-[#e8bd78]">
                 <Plus className="size-4" aria-hidden="true" />
               </span>
             </div>
-            <div className="mt-4 flex flex-wrap gap-2 border-t border-[#edf0ec] pt-3">
-              <span className="inline-flex items-center gap-2 rounded-lg bg-[#f5f7f4] px-3 py-2 text-xs text-[#75847b]">
+            <div className="mt-4 flex flex-wrap gap-2 border-t border-[#edf0ec] pt-3 dark:border-white/10">
+              <span className="inline-flex items-center gap-2 rounded-lg bg-[#f5f7f4] px-3 py-2 text-xs text-[#75847b] dark:bg-white/[0.06] dark:text-white/70">
                 <Mountain className="size-3.5 text-[#a77845]" aria-hidden="true" />
                 Hike recap
               </span>
-              <span className="inline-flex items-center gap-2 rounded-lg bg-[#f5f7f4] px-3 py-2 text-xs text-[#75847b]">
+              <span className="inline-flex items-center gap-2 rounded-lg bg-[#f5f7f4] px-3 py-2 text-xs text-[#75847b] dark:bg-white/[0.06] dark:text-white/70">
                 <MapPin className="size-3.5 text-[#a77845]" aria-hidden="true" />
                 Trail note
               </span>
-              <span className="ml-auto hidden items-center gap-1.5 text-[10px] text-[#9aa59e] sm:inline-flex">
+              <span className="ml-auto hidden items-center gap-1.5 text-[10px] text-[#9aa59e] dark:text-white/45 sm:inline-flex">
                 <Heart className="size-3" aria-hidden="true" /> You choose what to share
               </span>
             </div>
@@ -69,14 +71,16 @@ export function HomeFeedContent({ displayName }: { displayName: string }) {
             <h2 className="text-base font-semibold tracking-tight text-[#263d33] dark:text-[#edf4ef]">
               From the trail
             </h2>
-            <span className="text-[10px] text-[#89968e]">Sample community updates</span>
+            <span className="text-[10px] text-[#89968e] dark:text-white/50">
+              Sample community updates
+            </span>
           </div>
           <div className="space-y-4">
             {sampleActivities.map((post) => (
               <ActivityFeedPost key={post.author} post={post} />
             ))}
           </div>
-          <p className="mt-4 px-1 text-[10px] leading-5 text-[#98a39c]">
+          <p className="mt-4 px-1 text-[10px] leading-5 text-[#98a39c] dark:text-white/40">
             Feed examples are design previews. Real activity appears only when someone chooses to
             share it.
           </p>
