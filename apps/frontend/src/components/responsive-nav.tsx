@@ -169,6 +169,9 @@ export function ResponsiveNav({
             </span>
           </Link>
         )}
+        {isAuthenticated && (
+          <HomeFeedAccountMenu displayName={accountName} initials={initials} variant="rail" />
+        )}
         <button
           type="button"
           aria-label="Back to top"
