@@ -44,10 +44,10 @@
 
 ### Onboarding domain/API
 
-- Create enums in `apps/backend/src/main/java/com/vencentdev/backend/modules/user/onboarding/` for experience, preferred difficulty, age range, interest, and referral source.
-- Create `UserOnboardingProfile`, its repository, request/response DTOs, service, and controller under `apps/backend/src/main/java/com/vencentdev/backend/modules/user/onboarding/`.
+- Create enums in `apps/backend/src/main/java/com/vencentdev/backend/modules/user/enums/onboarding/` for experience, preferred difficulty, age range, interest, and referral source.
+- Create `UserOnboardingProfile` under `modules/user/entity/`, its repository under `modules/user/repository/`, request/response DTOs under `modules/user/dto/onboarding/`, mapper under `modules/user/mapper/onboarding/`, service under `modules/user/service/onboarding/`, and controller under `modules/user/controller/onboarding/`.
 - Add `apps/backend/src/main/resources/db/migration/V5__add_user_onboarding_profile.sql` to add profile storage, an interests collection table, and completed rows for pre-existing users.
-- Modify `apps/backend/src/main/java/com/vencentdev/backend/modules/auth/controller/AuthController.java` so successful registration initializes an incomplete onboarding row.
+- Create `apps/backend/src/main/java/com/vencentdev/backend/modules/auth/service/CredentialsRegistrationService.java` to create the user and initialize their onboarding row in one transaction; update `AuthController.java` to delegate registration to it.
 - The onboarding GET endpoint provisions a first-time OAuth user via `UserService.findOrProvision`, initializes their profile when absent, and returns only their own data.
 
 ### Frontend onboarding and gate
@@ -63,7 +63,7 @@
 - `LoginResponse`: `{ user: UserResponse, accessToken: string, tokenType: "Bearer", expiresIn: number }`.
 - `GET /api/v1/users/me/onboarding`: returns `OnboardingProfileResponse` and provisions the first-time OAuth user/profile if absent.
 - `PUT /api/v1/users/me/onboarding`: saves required preferences as a draft when analytics consent is absent; completes onboarding when consent is explicitly `true` or `false`. If consent is false, optional analytics values are cleared and omitted.
-- `OnboardingProfileResponse`: `{ completed: boolean, experienceLevel: ExperienceLevel | null, preferredDifficulty: TrailDifficulty | null, analyticsConsent: boolean | null, ageRange: AgeRange | null, interests: Interest[], referralSource: ReferralSource | null }`.
+- `OnboardingProfileResponse`: `{ completed: boolean, completedAt: string | null, experienceLevel: ExperienceLevel | null, preferredDifficulty: TrailDifficulty | null, analyticsConsent: boolean | null, ageRange: AgeRange | null, interests: Interest[], referralSource: ReferralSource | null }`.
 - `OnboardingProfileRequest`: `{ experienceLevel: ExperienceLevel, preferredDifficulty: TrailDifficulty, analyticsConsent?: boolean, ageRange?: AgeRange, interests?: Interest[], referralSource?: ReferralSource }`.
 - `ApiTokenService.issue(UserResponse user)`: returns a signed token whose subject resolves to the same credentials external ID (`credentials:<normalized-email>`); claims include issuer, audience, expiry, email, display name, and user role.
 - `getSafeInternalRedirect(value, fallback)`: returns an app-local path only, rejecting absolute external URLs and protocol-relative paths.
@@ -92,22 +92,22 @@
 
 **Files:**
 
-- Create the onboarding enums, entity, repository, DTOs, service, and controller.
+- Create the onboarding enums, entity, repository, DTOs, mapper, service, controller, and `CredentialsRegistrationService`.
 - Create `V5__add_user_onboarding_profile.sql`.
-- Modify `AuthController.java` to initialize onboarding for newly registered credentials users.
+- Modify `AuthController.java` to delegate new credentials registration through `CredentialsRegistrationService`.
 
 **Interfaces:**
 
 - Consumes DAPYO or provider-authenticated `AuthenticatedUser` from Task 1.
 - Produces the GET/PUT onboarding endpoints and `OnboardingProfileResponse` defined above.
 
-- [ ] Create `user_onboarding_profiles` with required preference columns, consent state/version/time, optional age/referral fields, and nullable `completed_at`; create a child interest table.
-- [ ] In the migration, create a completed profile row with no inferred preference or analytics answers for every user that already exists.
-- [ ] Define stable values: experience `NEW_TO_HIKING`, `SOME_EXPERIENCE`, `HIKE_REGULARLY`; difficulty `EASY`, `MODERATE`, `CHALLENGING`; age buckets `13_17`, `18_24`, `25_34`, `35_44`, `45_54`, `55_PLUS`; interests `NATURE`, `PHOTOGRAPHY`, `CAMPING`, `BIRDWATCHING`, `FITNESS`, `COMMUNITY`, `OTHER`; referral `FRIEND`, `SOCIAL_MEDIA`, `SEARCH`, `EVENT`, `OTHER`.
-- [ ] Initialize new credentials registrations as incomplete; have the onboarding GET endpoint provision first-time OAuth identities and initialize their incomplete profile.
-- [ ] Scope all reads/writes to the authenticated user; only return optional analytics values to that same user.
-- [ ] Make PUT without `analyticsConsent` save a draft only; PUT with explicit `true` stores consent version/time and optional values; PUT with `false` completes without optional values and clears any previously stored optional answers.
-- [ ] Keep onboarding fields out of `UserResponse` and all public profile output.
+- [x] Create `user_onboarding_profiles` with required preference columns, consent state/version/time, optional age/referral fields, and nullable `completed_at`; create a child interest table.
+- [x] In the migration, create a completed profile row with no inferred preference or analytics answers for every user that already exists.
+- [x] Define stable values: experience `NEW_TO_HIKING`, `SOME_EXPERIENCE`, `HIKE_REGULARLY`; difficulty `EASY`, `MODERATE`, `CHALLENGING`; age buckets `AGE_13_17`, `AGE_18_24`, `AGE_25_34`, `AGE_35_44`, `AGE_45_54`, `AGE_55_PLUS`; interests `NATURE`, `PHOTOGRAPHY`, `CAMPING`, `BIRDWATCHING`, `FITNESS`, `COMMUNITY`, `OTHER`; referral `FRIEND`, `SOCIAL_MEDIA`, `SEARCH`, `EVENT`, `OTHER`.
+- [x] Initialize new credentials registrations as incomplete in the same transaction; have the onboarding GET endpoint provision first-time OAuth identities and initialize their incomplete profile.
+- [x] Scope all reads/writes to the authenticated user; only return optional analytics values to that same user.
+- [x] Make PUT without `analyticsConsent` save a draft only; PUT with explicit `true` stores consent version/time and optional values; PUT with `false` completes without optional values and clears any previously stored optional answers.
+- [x] Keep onboarding fields out of `UserResponse` and all public profile output.
 
 ### Task 3: Build the two-step onboarding UI
 
