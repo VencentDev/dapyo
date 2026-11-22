@@ -3,6 +3,7 @@ package com.vencentdev.backend.modules.user.service.onboarding;
 import com.vencentdev.backend.modules.auth.AuthenticatedUser;
 import com.vencentdev.backend.modules.user.dto.UserResponse;
 import com.vencentdev.backend.modules.user.dto.onboarding.OnboardingProfileRequest;
+import com.vencentdev.backend.modules.user.dto.onboarding.OnboardingProfileResponse;
 import com.vencentdev.backend.modules.user.entity.OnboardingProfile;
 import com.vencentdev.backend.modules.user.mapper.onboarding.OnboardingProfileMapper;
 import com.vencentdev.backend.modules.user.repository.OnboardingProfileRepository;
