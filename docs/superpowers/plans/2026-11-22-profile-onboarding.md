@@ -54,9 +54,10 @@
 
 - Create the thin route `apps/frontend/src/app/onboarding/page.tsx`.
 - Create onboarding page content, wizard form, two step components, options, types, and API hooks under `apps/frontend/src/features/auth/onboarding/`.
+- Add `getSafeInternalRedirect` and onboarding URL construction in `apps/frontend/src/lib/auth-routes.ts` for the onboarding server page.
 - Modify `apps/frontend/src/features/auth/signup/components/signup-page-form.tsx` and `apps/frontend/src/features/auth/shared/components/oauth-buttons.tsx` to send newly created accounts to onboarding while preserving a safe local callback.
 - Modify `apps/frontend/src/features/home/feed/components/home-feed-page-content.tsx` to fetch backend onboarding state and redirect incomplete accounts to `/onboarding?callbackUrl=%2Fhome` before rendering Home.
-- Modify `apps/frontend/src/lib/auth-routes.ts` to validate callback paths as local paths and to build onboarding URLs.
+- Reuse the callback helpers added in Task 3 for signup, login, and Home routing.
 
 ## Interfaces
 
@@ -114,24 +115,25 @@
 **Files:**
 
 - Create route and feature files under `apps/frontend/src/app/onboarding/` and `apps/frontend/src/features/auth/onboarding/`.
+- Modify `apps/frontend/src/lib/auth-routes.ts` to provide safe local callback and onboarding URL helpers.
 
 **Interfaces:**
 
 - Consumes the GET/PUT onboarding API from Task 2 and `session.accessToken` from Task 1.
 - Produces a server-rendered onboarding entry that redirects unauthenticated users through login and renders a client wizard for authenticated incomplete users.
 
-- [ ] Implement Step 1 with required experience and preferred difficulty choices; continue is unavailable until both have values, then persist them as an incomplete draft.
-- [ ] Implement Step 2 with an initially unselected consent choice: “Share optional insights” or “Skip optional questions.” Only show age range, interests, and referral source after consent is selected; keep each answer optional.
-- [ ] Use consent copy that says values are private, optional, and used only for aggregate product analysis; store consent version `onboarding-2026-11-v1` when accepted.
-- [ ] On finish, submit the explicit consent choice; omit optional answers on decline; on success route to the safe callback, default `/home`.
-- [ ] Restore required preferences from the server draft when an incomplete user returns; preserve entered values when navigating between steps.
-- [ ] Follow existing DAPYO light/dark form styling and provide keyboard labels, visible step progress, inline errors, and focus movement to each step heading.
+- [x] Implement Step 1 with required experience and preferred difficulty choices; continue is unavailable until both have values, then persist them as an incomplete draft.
+- [x] Implement Step 2 with an initially unselected consent choice: “Share optional insights” or “Skip optional questions.” Only show age range, interests, and referral source after consent is selected; keep each answer optional.
+- [x] Use consent copy that says values are private, optional, and used only for aggregate product analysis; store consent version `onboarding-2026-11-v1` when accepted.
+- [x] On finish, submit the explicit consent choice; omit optional answers on decline; on success route to the safe callback, default `/home`.
+- [x] Restore required preferences from the server draft when an incomplete user returns; preserve entered values when navigating between steps.
+- [x] Follow existing DAPYO light/dark form styling and provide keyboard labels, visible step progress, inline errors, and focus movement to each step heading.
 
 ### Task 4: Route signup through onboarding and gate Home
 
 **Files:**
 
-- Modify `signup-page-form.tsx`, `oauth-buttons.tsx`, `auth-routes.ts`, and `home-feed-page-content.tsx`.
+- Modify `signup-page-form.tsx`, `oauth-buttons.tsx`, and `home-feed-page-content.tsx`.
 - Modify `login-page-content.tsx` and `signup-page-content.tsx` only if required to preserve callback behavior for already authenticated sessions.
 
 **Interfaces:**
