@@ -9,6 +9,7 @@ import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -68,6 +69,12 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(AccessDeniedException.class)
   ResponseEntity<ApiError> handleAccessDenied(AccessDeniedException exception) {
     return error(HttpStatus.FORBIDDEN, "ACCESS_DENIED", "Access denied", List.of());
+  }
+
+  @ExceptionHandler(BadCredentialsException.class)
+  ResponseEntity<ApiError> handleBadCredentials(BadCredentialsException exception) {
+    return error(
+        HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS", "Invalid email or password", List.of());
   }
 
   @ExceptionHandler(AuthenticationException.class)

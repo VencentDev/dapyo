@@ -1,7 +1,7 @@
 package com.vencentdev.backend.modules.user.service;
 
-import com.vencentdev.backend.common.exception.ResourceNotFoundException;
 import com.vencentdev.backend.common.exception.ConflictException;
+import com.vencentdev.backend.common.exception.ResourceNotFoundException;
 import com.vencentdev.backend.modules.auth.AuthenticatedUser;
 import com.vencentdev.backend.modules.auth.dto.LoginRequest;
 import com.vencentdev.backend.modules.auth.dto.RegisterRequest;
@@ -36,7 +36,8 @@ public class UserServiceImpl implements UserService {
   }
 
   public UserServiceImpl(UserRepository repository, UserMapper mapper) {
-    this(repository, mapper, new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder());
+    this(
+        repository, mapper, new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder());
   }
 
   @Override
@@ -78,8 +79,10 @@ public class UserServiceImpl implements UserService {
   @Override
   @Transactional(readOnly = true)
   public UserResponse authenticate(LoginRequest request) {
-    User user = repository.findByEmail(normalizeEmail(request.email())).orElseThrow(
-        () -> new BadCredentialsException("Invalid email or password"));
+    User user =
+        repository
+            .findByEmail(normalizeEmail(request.email()))
+            .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
     if (user.getPasswordHash() == null
         || !passwordEncoder.matches(request.password(), user.getPasswordHash())) {
       throw new BadCredentialsException("Invalid email or password");

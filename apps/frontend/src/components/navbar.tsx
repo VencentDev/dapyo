@@ -4,5 +4,5 @@ import { auth } from '@/lib/auth';
 export async function Navbar() {
   const session = await auth();
 
-  return <ResponsiveNav isAuthenticated={Boolean(session)} />;
+  return <ResponsiveNav isAuthenticated={Boolean(session)} displayName={session?.user?.name} />;
 }
