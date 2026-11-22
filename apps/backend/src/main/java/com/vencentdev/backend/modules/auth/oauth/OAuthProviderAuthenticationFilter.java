@@ -1,5 +1,6 @@
 package com.vencentdev.backend.modules.auth.oauth;
 
+import com.vencentdev.backend.config.JwtAuthConverter;
 import com.vencentdev.backend.modules.auth.AuthenticatedUser;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -9,6 +10,8 @@ import java.io.IOException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -18,9 +21,16 @@ public class OAuthProviderAuthenticationFilter extends OncePerRequestFilter {
   private static final String BEARER_PREFIX = "Bearer ";
 
   private final OAuthProviderUserInfoClient userInfoClient;
+  private final JwtDecoder jwtDecoder;
+  private final JwtAuthConverter jwtAuthConverter;
 
-  public OAuthProviderAuthenticationFilter(OAuthProviderUserInfoClient userInfoClient) {
+  public OAuthProviderAuthenticationFilter(
+      OAuthProviderUserInfoClient userInfoClient,
+      JwtDecoder jwtDecoder,
+      JwtAuthConverter jwtAuthConverter) {
     this.userInfoClient = userInfoClient;
+    this.jwtDecoder = jwtDecoder;
+    this.jwtAuthConverter = jwtAuthConverter;
   }
 
   @Override
@@ -31,6 +41,15 @@ public class OAuthProviderAuthenticationFilter extends OncePerRequestFilter {
     if (accessToken == null || SecurityContextHolder.getContext().getAuthentication() != null) {
       filterChain.doFilter(request, response);
       return;
+    }
+
+    try {
+      SecurityContextHolder.getContext()
+          .setAuthentication(jwtAuthConverter.convert(jwtDecoder.decode(accessToken)));
+      filterChain.doFilter(request, response);
+      return;
+    } catch (JwtException ignored) {
+      // Provider tokens are validated by their user-info endpoints below.
     }
 
     AuthenticatedUser user = userInfoClient.resolve(accessToken);

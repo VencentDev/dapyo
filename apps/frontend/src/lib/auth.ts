@@ -29,13 +29,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         );
 
         if (!response.ok) return null;
-        const user = (await response.json()) as {
-          id: string;
-          email: string;
-          displayName: string;
+        const login = (await response.json()) as {
+          user: { id: string; email: string; displayName: string };
+          accessToken: string;
         };
 
-        return { id: user.id, email: user.email, name: user.displayName };
+        return {
+          id: login.user.id,
+          email: login.user.email,
+          name: login.user.displayName,
+          accessToken: login.accessToken,
+        };
       },
     }),
     Google({
@@ -65,11 +69,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   session: { strategy: 'jwt' },
   callbacks: {
-    async jwt({ token, account }) {
+    async jwt({ token, account, user }) {
       if (account) {
-        token.accessToken = account.access_token;
         token.provider = account.provider;
+        if (account.access_token) token.accessToken = account.access_token;
       }
+      if (user?.accessToken) token.accessToken = user.accessToken;
 
       return token;
     },

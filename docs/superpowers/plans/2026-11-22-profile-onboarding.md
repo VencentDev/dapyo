@@ -82,11 +82,11 @@
 - Produces `POST /api/v1/auth/login` response `LoginResponse`.
 - Produces `ApiTokenService.issue(UserResponse): String` and the typed Auth.js credentials user `accessToken`.
 
-- [ ] Configure Nimbus HS256 encoder/decoder using a required base64 runtime secret, issuer `dapyo-api`, audience `dapyo-web`, and a 12-hour expiry; do not add a source-controlled secret.
-- [ ] Make the OAuth provider filter try DAPYO JWT validation first, then keep the existing Google/GitHub user-info resolution for provider tokens; reject tokens that pass neither path.
-- [ ] Issue tokens for authenticated credentials users with subject `credentials:<normalized-email>` and role `USER`.
-- [ ] Return the token in `LoginResponse`; update the Auth.js credentials provider to parse it and the JWT/session callbacks to retain it, while OAuth sessions keep their provider token.
-- [ ] Add only placeholder/generation instructions for the required secret to `.env.example`; do not alter `.env`.
+- [x] Configure Nimbus HS256 encoder/decoder using a required base64 runtime secret, issuer `dapyo-api`, audience `dapyo-web`, and a 12-hour expiry; do not add a source-controlled secret.
+- [x] Make the OAuth provider filter try DAPYO JWT validation first, then keep the existing Google/GitHub user-info resolution for provider tokens; reject tokens that pass neither path.
+- [x] Issue tokens for authenticated credentials users with subject `credentials:<normalized-email>` and role `USER`.
+- [x] Return the token in `LoginResponse`; update the Auth.js credentials provider to parse it and the JWT/session callbacks to retain it, while OAuth sessions keep their provider token.
+- [x] Add only placeholder/generation instructions for the required secret to `.env.example`; do not alter `.env`.
 
 ### Task 2: Add onboarding persistence and self-service endpoints
 
