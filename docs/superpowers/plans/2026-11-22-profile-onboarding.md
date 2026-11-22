@@ -133,19 +133,19 @@
 
 **Files:**
 
-- Modify `signup-page-form.tsx`, `oauth-buttons.tsx`, and `home-feed-page-content.tsx`.
-- Modify `login-page-content.tsx` and `signup-page-content.tsx` only if required to preserve callback behavior for already authenticated sessions.
+- Modify `signup-page-form.tsx`, `oauth-buttons.tsx`, `home-feed-page-content.tsx`, `login-page-content.tsx`, and the login route entry to support re-authentication after an expired/missing API token.
+- Preserve signup and login callback behavior for already authenticated sessions.
 
 **Interfaces:**
 
 - Consumes `serverApi<OnboardingProfileResponse>` from Task 2 and local callback helpers.
 - Produces signup and Home redirects that enforce incomplete onboarding before Home renders.
 
-- [ ] After credentials signup/sign-in succeeds, navigate to `/onboarding` and carry the original local callback as `callbackUrl` (default `/home`).
-- [ ] Make OAuth buttons on signup carry the same onboarding destination; the onboarding page will immediately forward already-complete OAuth users to their callback.
-- [ ] In the Home server page, redirect unauthenticated users to login as today; for authenticated users, fetch onboarding state and redirect incomplete profiles to `/onboarding?callbackUrl=%2Fhome` before rendering feed content.
-- [ ] Use a shared same-origin/local-path validator for signup, login, onboarding, and completion redirects; reject external and protocol-relative callback values.
-- [ ] If an onboarding API call returns 401, send the user through login with the intended local callback; allow other API errors to surface rather than silently bypassing the gate.
+- [x] After credentials signup/sign-in succeeds, navigate to `/onboarding` and carry the original local callback as `callbackUrl` (default `/home`).
+- [x] Make OAuth buttons on signup carry the same onboarding destination; the onboarding page will immediately forward already-complete OAuth users to their callback.
+- [x] In the Home server page, redirect unauthenticated users to login as today; for authenticated users, fetch onboarding state and redirect incomplete profiles to `/onboarding?callbackUrl=%2Fhome` before rendering feed content.
+- [x] Use a shared same-origin/local-path validator for signup, login, onboarding, and completion redirects; reject external and protocol-relative callback values.
+- [x] If an onboarding API call returns 401, send the user through login with `reauth=1` and the intended local callback; the login page must show the form even when an old session exists. Allow other API errors to surface rather than silently bypassing the gate.
 
 ## Execution notes
 

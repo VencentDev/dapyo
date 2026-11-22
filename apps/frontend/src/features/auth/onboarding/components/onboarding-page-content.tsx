@@ -35,7 +35,7 @@ export async function OnboardingPageContent({
     profile = await serverApi<OnboardingProfile>('/api/v1/users/me/onboarding');
   } catch (error) {
     if (error instanceof ApiError && error.status === 401) {
-      redirect(`/login?callbackUrl=${encodeURIComponent(loginCallback)}`);
+      redirect(`/login?reauth=1&callbackUrl=${encodeURIComponent(loginCallback)}`);
     }
     throw error;
   }

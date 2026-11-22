@@ -5,18 +5,25 @@ import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 
 import { authProviders } from '@/lib/auth-providers';
-import { protectedHomePath } from '@/lib/auth-routes';
+import { getOnboardingPath, getPostAuthRedirect, protectedHomePath } from '@/lib/auth-routes';
 
 type OAuthButtonsProps = {
   callbackUrl?: string;
+  afterAuthOnboarding?: boolean;
 };
 
-export function OAuthButtons({ callbackUrl = protectedHomePath }: OAuthButtonsProps) {
+export function OAuthButtons({
+  callbackUrl = protectedHomePath,
+  afterAuthOnboarding = false,
+}: OAuthButtonsProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const redirectTo = afterAuthOnboarding
+    ? getOnboardingPath(callbackUrl)
+    : getPostAuthRedirect(callbackUrl);
 
   function handleGoogleSignIn() {
     setIsLoading(true);
-    void signIn(authProviders.google, { redirectTo: callbackUrl });
+    void signIn(authProviders.google, { redirectTo });
     window.setTimeout(() => setIsLoading(false), 1200);
   }
 

@@ -11,7 +11,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { OAuthButtons } from '@/features/auth/shared/components/oauth-buttons';
 import { signIn } from 'next-auth/react';
 import { ApiError, clientApi } from '@/lib/api';
-import { getPostAuthRedirect } from '@/lib/auth-routes';
+import { getOnboardingPath, getPostAuthRedirect } from '@/lib/auth-routes';
 
 export function SignupPageForm() {
   return (
@@ -70,7 +70,7 @@ function SignupShell({ callbackUrl }: { callbackUrl?: string }) {
         email: email.trim(),
         password,
         redirect: false,
-        redirectTo: callbackUrl,
+        redirectTo: getOnboardingPath(callbackUrl),
       });
       if (!result?.error && result?.url) {
         window.location.assign(result.url);
@@ -232,7 +232,7 @@ function SignupShell({ callbackUrl }: { callbackUrl?: string }) {
             <div className="my-8">
               <AuthDivider label="Or continue with" />
             </div>
-            <OAuthButtons callbackUrl={callbackUrl} />
+            <OAuthButtons callbackUrl={callbackUrl} afterAuthOnboarding />
             <p className="mt-8 text-center text-sm text-[#668077] dark:text-[#b5c9bd]">
               Already have an account?{' '}
               <Link href="/login" className="font-semibold text-[#1d604c] hover:text-[#d09b51]">
