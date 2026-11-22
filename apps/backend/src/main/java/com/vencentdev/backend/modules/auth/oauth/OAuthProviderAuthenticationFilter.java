@@ -10,6 +10,7 @@ import java.io.IOException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Component;
@@ -43,13 +44,17 @@ public class OAuthProviderAuthenticationFilter extends OncePerRequestFilter {
       return;
     }
 
+    Jwt dapyoToken = null;
     try {
-      SecurityContextHolder.getContext()
-          .setAuthentication(jwtAuthConverter.convert(jwtDecoder.decode(accessToken)));
-      filterChain.doFilter(request, response);
-      return;
+      dapyoToken = jwtDecoder.decode(accessToken);
     } catch (JwtException ignored) {
       // Provider tokens are validated by their user-info endpoints below.
+    }
+
+    if (dapyoToken != null) {
+      SecurityContextHolder.getContext().setAuthentication(jwtAuthConverter.convert(dapyoToken));
+      filterChain.doFilter(request, response);
+      return;
     }
 
     AuthenticatedUser user = userInfoClient.resolve(accessToken);
