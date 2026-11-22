@@ -1,11 +1,13 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { ArrowUp, Compass, LogIn, Menu, Mountain, Users, X } from 'lucide-react';
+import { ArrowUp, Compass, Home, Mountain, Users } from 'lucide-react';
 
-import { SignOutButton } from '@/components/sign-out-button';
+import { DapyoLogo } from '@/components/dapyo-logo';
 import { siteConfig } from '@/config/site';
+import { HomeFeedAccountMenu } from '@/features/home/feed/components/home-feed-account-menu';
 import { cn } from '@/lib/utils';
 
 const links = [
@@ -14,14 +16,39 @@ const links = [
   { href: '#community', label: 'Community', icon: Users },
 ];
 
-export function ResponsiveNav({ isAuthenticated }: { isAuthenticated: boolean }) {
+export function ResponsiveNav({
+  isAuthenticated,
+  displayName,
+}: {
+  isAuthenticated: boolean;
+  displayName?: string | null;
+}) {
+  const pathname = usePathname();
+  const isHomeRoute = pathname === '/home' || pathname.startsWith('/home/');
   const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('');
+  const accountName = displayName?.trim() || 'Hiker';
+  const initials =
+    accountName
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((part) => part[0])
+      .join('')
+      .toUpperCase() || 'H';
 
   useEffect(() => {
-    const updateScrollState = () => {
-      setScrolled(window.scrollY > 96);
+    if (isHomeRoute) return;
+
+    const updateScrollState = (event?: Event) => {
+      const eventScrollTop = event?.target instanceof HTMLElement ? event.target.scrollTop : 0;
+      const scrollTop = Math.max(
+        window.scrollY,
+        document.documentElement.scrollTop,
+        document.body.scrollTop,
+        document.scrollingElement?.scrollTop ?? 0,
+        eventScrollTop,
+      );
+      setScrolled(scrollTop > 24);
 
       const marker = window.innerHeight * 0.45;
       let currentSection = '';
@@ -41,13 +68,17 @@ export function ResponsiveNav({ isAuthenticated }: { isAuthenticated: boolean })
 
     updateScrollState();
     window.addEventListener('scroll', updateScrollState, { passive: true });
+    document.addEventListener('scroll', updateScrollState, { capture: true, passive: true });
     window.addEventListener('resize', updateScrollState, { passive: true });
 
     return () => {
       window.removeEventListener('scroll', updateScrollState);
+      document.removeEventListener('scroll', updateScrollState, true);
       window.removeEventListener('resize', updateScrollState);
     };
-  }, []);
+  }, [isHomeRoute]);
+
+  if (isHomeRoute) return null;
 
   return (
     <>
@@ -62,7 +93,7 @@ export function ResponsiveNav({ isAuthenticated }: { isAuthenticated: boolean })
             href="/"
             className="flex shrink-0 items-center gap-2.5 font-mono text-sm font-semibold tracking-[0.18em]"
           >
-            <Mountain className="size-[1.15rem]" strokeWidth={1.8} aria-hidden="true" />
+            <DapyoLogo className="size-7" />
             {siteConfig.navName}
           </Link>
           <span className="hidden text-white/35 md:inline" aria-hidden="true">
@@ -78,52 +109,32 @@ export function ResponsiveNav({ isAuthenticated }: { isAuthenticated: boolean })
             </div>
             <div className="ml-auto flex items-center gap-3">
               {isAuthenticated ? (
-                <SignOutButton />
+                <HomeFeedAccountMenu
+                  displayName={accountName}
+                  initials={initials}
+                  variant="header"
+                />
               ) : (
                 <Link
-                  href="/login"
-                  aria-label="Sign in"
-                  title="Sign in"
+                  href="/home"
+                  aria-label="Open DAPYO"
+                  title="Open DAPYO"
                   className="flex items-center gap-2 rounded-[8px] border border-white/20 bg-white/10 px-3 py-2 text-sm font-medium text-white shadow-lg shadow-black/10 backdrop-blur-md transition-all hover:border-white/35 hover:bg-white/20 hover:text-white active:scale-[.97]"
                 >
-                  <LogIn className="size-[1.1rem]" strokeWidth={1.8} />
-                  <span>Sign in</span>
+                  <Home className="size-[1.1rem]" strokeWidth={1.8} />
+                  <span>Open DAPYO</span>
                 </Link>
               )}
-              <button
-                type="button"
-                aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
-                aria-expanded={mobileOpen}
-                onClick={() => setMobileOpen((open) => !open)}
-                className="inline-flex size-9 items-center justify-center rounded-[8px] border border-white/25 text-white transition-colors hover:bg-white/10 md:hidden"
-              >
-                {mobileOpen ? <X className="size-4" /> : <Menu className="size-4" />}
-              </button>
             </div>
           </nav>
         </div>
-        {mobileOpen && (
-          <nav className="mx-5 rounded-[8px] border border-white/15 bg-[#10231f]/75 p-2 text-white shadow-2xl backdrop-blur-xl md:hidden">
-            {links.map(({ href, label, icon: Icon }) => (
-              <Link
-                key={href}
-                href={href}
-                onClick={() => setMobileOpen(false)}
-                className="flex items-center gap-3 rounded-[8px] px-4 py-3 text-sm text-white/80 hover:bg-white/10 hover:text-white"
-              >
-                <Icon className="size-4" />
-                {label}
-              </Link>
-            ))}
-          </nav>
-        )}
       </header>
 
       <aside
         aria-label="Section navigation"
         className={cn(
-          'fixed left-6 top-1/2 z-50 hidden -translate-y-1/2 flex-col gap-3 rounded-[8px] border border-white/20 bg-[#10231f]/55 p-2 text-white shadow-2xl shadow-black/20 backdrop-blur-xl transition-all duration-300 xl:left-12 lg:flex',
-          scrolled ? 'translate-x-0 opacity-100' : 'pointer-events-none -translate-x-4 opacity-0',
+          'section-navigation-rail fixed left-1/2 z-50 flex flex-row items-center gap-1.5 rounded-[8px] border border-white/20 bg-[#10231f]/80 p-1.5 text-white shadow-2xl shadow-black/20 backdrop-blur-xl transition-all duration-300 lg:left-3 lg:top-1/2 lg:flex-col lg:gap-3 lg:p-2 xl:left-12',
+          scrolled ? 'is-visible' : 'is-hidden',
         )}
       >
         {links.map(({ href, label, icon: Icon }) => (
@@ -133,28 +144,28 @@ export function ResponsiveNav({ isAuthenticated }: { isAuthenticated: boolean })
             aria-label={label}
             title={label}
             className={cn(
-              'group relative flex size-12 items-center justify-center rounded-[8px] text-white/55 transition-colors hover:bg-white/10 hover:text-white',
+              'group relative flex size-9 items-center justify-center rounded-[8px] text-white/55 transition-colors hover:bg-white/10 hover:text-white lg:size-12',
               activeSection === href &&
                 'bg-[#d8a75f] text-[#17251f] hover:bg-[#e5bb7d] hover:text-[#17251f]',
             )}
           >
             <Icon className="size-[1.1rem]" strokeWidth={1.8} />
-            <span className="pointer-events-none absolute left-full top-1/2 ml-3 -translate-y-1/2 whitespace-nowrap rounded-[8px] border border-white/15 bg-[#10231f]/85 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-white/85 opacity-0 shadow-xl backdrop-blur-xl transition-opacity group-hover:opacity-100">
+            <span className="section-navigation-label pointer-events-none absolute left-full top-1/2 ml-3 -translate-y-1/2 whitespace-nowrap rounded-[8px] border border-white/15 bg-[#10231f]/85 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-white/85 opacity-0 shadow-xl backdrop-blur-xl transition-opacity group-hover:opacity-100">
               {label}
             </span>
           </Link>
         ))}
-        <span className="mx-2 h-px bg-white/15" aria-hidden="true" />
+        <span className="section-navigation-divider" aria-hidden="true" />
         {!isAuthenticated && (
           <Link
-            href="/login"
-            aria-label="Sign in"
-            title="Sign in"
-            className="group relative flex size-12 items-center justify-center rounded-[8px] text-white/55 transition-colors hover:bg-white/10 hover:text-white"
+            href="/home"
+            aria-label="Open DAPYO"
+            title="Open DAPYO"
+            className="group relative flex size-9 items-center justify-center rounded-[8px] text-white/55 transition-colors hover:bg-white/10 hover:text-white lg:size-12"
           >
-            <LogIn className="size-[1.1rem]" strokeWidth={1.8} />
-            <span className="pointer-events-none absolute left-full top-1/2 ml-3 -translate-y-1/2 whitespace-nowrap rounded-[8px] border border-white/15 bg-[#10231f]/85 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-white/85 opacity-0 shadow-xl backdrop-blur-xl transition-opacity group-hover:opacity-100">
-              Sign in
+            <Home className="size-[1.1rem]" strokeWidth={1.8} />
+            <span className="section-navigation-label pointer-events-none absolute left-full top-1/2 ml-3 -translate-y-1/2 whitespace-nowrap rounded-[8px] border border-white/15 bg-[#10231f]/85 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-white/85 opacity-0 shadow-xl backdrop-blur-xl transition-opacity group-hover:opacity-100">
+              Open DAPYO
             </span>
           </Link>
         )}
@@ -163,10 +174,10 @@ export function ResponsiveNav({ isAuthenticated }: { isAuthenticated: boolean })
           aria-label="Back to top"
           title="Back to top"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="group relative flex size-12 items-center justify-center rounded-[8px] text-white/55 transition-colors hover:bg-white/10 hover:text-white"
+          className="group relative flex size-9 items-center justify-center rounded-[8px] text-white/55 transition-colors hover:bg-white/10 hover:text-white lg:size-12"
         >
           <ArrowUp className="size-[1.1rem]" strokeWidth={1.8} />
-          <span className="pointer-events-none absolute left-full top-1/2 ml-3 -translate-y-1/2 whitespace-nowrap rounded-[8px] border border-white/15 bg-[#10231f]/85 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-white/85 opacity-0 shadow-xl backdrop-blur-xl transition-opacity group-hover:opacity-100">
+          <span className="section-navigation-label pointer-events-none absolute left-full top-1/2 ml-3 -translate-y-1/2 whitespace-nowrap rounded-[8px] border border-white/15 bg-[#10231f]/85 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-white/85 opacity-0 shadow-xl backdrop-blur-xl transition-opacity group-hover:opacity-100">
             Back to top
           </span>
         </button>

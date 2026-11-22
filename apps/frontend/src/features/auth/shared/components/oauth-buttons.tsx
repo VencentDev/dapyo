@@ -5,12 +5,13 @@ import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 
 import { authProviders } from '@/lib/auth-providers';
+import { protectedHomePath } from '@/lib/auth-routes';
 
 type OAuthButtonsProps = {
   callbackUrl?: string;
 };
 
-export function OAuthButtons({ callbackUrl = '/' }: OAuthButtonsProps) {
+export function OAuthButtons({ callbackUrl = protectedHomePath }: OAuthButtonsProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   function handleGoogleSignIn() {

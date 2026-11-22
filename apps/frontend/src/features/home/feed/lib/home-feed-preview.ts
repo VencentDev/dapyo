@@ -1,0 +1,40 @@
+export const sampleActivities = [
+  {
+    author: 'Mika Santos',
+    initials: 'MS',
+    location: 'Baguio City',
+    time: '2 days ago',
+    title: 'Mt. Ulap sunrise',
+    note: 'A slow start, a steady climb, and a sunrise that made every step worth it. First time hiking with this crew, definitely not the last.',
+    image: '/images/how it works/hike.png',
+    imageAlt: 'A group of hikers sharing a mountain trail',
+    distance: '6.2 km',
+    duration: '4h 18m',
+    elevation: '680 m',
+    likes: 18,
+    comments: 4,
+    avatar: '#9b7358',
+  },
+  {
+    author: 'Paolo Reyes',
+    initials: 'PR',
+    location: 'Nasugbu, Batangas',
+    time: '5 days ago',
+    title: 'Batulao ridgeline',
+    note: 'The ridge opened up just as the clouds rolled through. Grateful for a good pace and even better company out there.',
+    image: '/images/hero-section.jpg',
+    imageAlt: 'Hikers walking together through a green mountain landscape',
+    distance: '7.1 km',
+    duration: '5h 02m',
+    elevation: '540 m',
+    likes: 12,
+    comments: 2,
+    avatar: '#668574',
+  },
+];
+
+export const popularTrails = [
+  { name: 'Mt. Ulap', location: 'Itogon, Benguet', length: '6 km' },
+  { name: 'Mt. Pulag', location: 'Kabayan, Benguet', length: '12 km' },
+  { name: 'Mt. Batulao', location: 'Nasugbu, Batangas', length: '7 km' },
+];
