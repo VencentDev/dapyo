@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { ArrowUp, Compass, Home, Mountain, Users } from 'lucide-react';
+import { ArrowUp, Compass, LogIn, Mountain, Users } from 'lucide-react';
 
 import { DapyoLogo } from '@/components/dapyo-logo';
 import { siteConfig } from '@/config/site';
@@ -25,6 +25,7 @@ export function ResponsiveNav({
 }) {
   const pathname = usePathname();
   const isHomeRoute = pathname === '/home' || pathname.startsWith('/home/');
+  const isAuthRoute = pathname === '/login' || pathname === '/signup';
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('');
   const accountName = displayName?.trim() || 'Hiker';
@@ -78,7 +79,7 @@ export function ResponsiveNav({
     };
   }, [isHomeRoute]);
 
-  if (isHomeRoute) return null;
+  if (isHomeRoute || isAuthRoute) return null;
 
   return (
     <>
@@ -116,13 +117,13 @@ export function ResponsiveNav({
                 />
               ) : (
                 <Link
-                  href="/home"
-                  aria-label="Open DAPYO"
-                  title="Open DAPYO"
+                  href="/login"
+                  aria-label="Sign in"
+                  title="Sign in"
                   className="flex items-center gap-2 rounded-[8px] border border-white/20 bg-white/10 px-3 py-2 text-sm font-medium text-white shadow-lg shadow-black/10 backdrop-blur-md transition-all hover:border-white/35 hover:bg-white/20 hover:text-white active:scale-[.97]"
                 >
-                  <Home className="size-[1.1rem]" strokeWidth={1.8} />
-                  <span>Open DAPYO</span>
+                  <LogIn className="size-[1.1rem]" strokeWidth={1.8} />
+                  <span>Sign in</span>
                 </Link>
               )}
             </div>
@@ -158,16 +159,19 @@ export function ResponsiveNav({
         <span className="section-navigation-divider" aria-hidden="true" />
         {!isAuthenticated && (
           <Link
-            href="/home"
-            aria-label="Open DAPYO"
-            title="Open DAPYO"
+            href="/login"
+            aria-label="Sign in"
+            title="Sign in"
             className="group relative flex size-9 items-center justify-center rounded-[8px] text-white/55 transition-colors hover:bg-white/10 hover:text-white lg:size-12"
           >
-            <Home className="size-[1.1rem]" strokeWidth={1.8} />
+            <LogIn className="size-[1.1rem]" strokeWidth={1.8} />
             <span className="section-navigation-label pointer-events-none absolute left-full top-1/2 ml-3 -translate-y-1/2 whitespace-nowrap rounded-[8px] border border-white/15 bg-[#10231f]/85 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-white/85 opacity-0 shadow-xl backdrop-blur-xl transition-opacity group-hover:opacity-100">
-              Open DAPYO
+              Sign in
             </span>
           </Link>
+        )}
+        {isAuthenticated && (
+          <HomeFeedAccountMenu displayName={accountName} initials={initials} variant="rail" />
         )}
         <button
           type="button"

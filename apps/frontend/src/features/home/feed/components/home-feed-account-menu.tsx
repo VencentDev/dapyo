@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { LogOut, Settings, UserRound } from 'lucide-react';
+import { LogOut, Settings, SunMoon, UserRound } from 'lucide-react';
 import { useState } from 'react';
 import { useTheme } from 'next-themes';
 import { signOut } from 'next-auth/react';
@@ -21,7 +21,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-type AccountMenuVariant = 'sidebar' | 'collapsed' | 'mobile' | 'header';
+type AccountMenuVariant = 'sidebar' | 'collapsed' | 'mobile' | 'header' | 'rail';
 
 type DocumentWithViewTransition = Document & {
   startViewTransition?: (updateCallback: () => void) => { finished: Promise<void> };
@@ -44,15 +44,18 @@ export function HomeFeedAccountMenu({
   const isMobile = variant === 'mobile';
   const isCollapsed = variant === 'collapsed';
   const isHeader = variant === 'header';
+  const isRail = variant === 'rail';
   const avatarSize = isMobile ? 'size-6 text-[8px]' : 'size-9 text-xs';
 
   const triggerClassName = isMobile
     ? 'flex min-h-12 w-full flex-col items-center justify-center gap-1 rounded-lg text-[9px] font-medium text-[#7a8980] transition-colors hover:bg-[#f5f7f4] hover:text-[#1d604c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d8a75f] dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white'
     : isHeader
       ? 'grid size-10 place-items-center rounded-full transition-transform hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8bd78]'
-      : isCollapsed
-        ? 'mx-auto grid size-11 place-items-center rounded-[8px] text-[#64756c] transition-colors hover:bg-[#edf2ed] hover:text-[#17342e] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8bd78] dark:text-white dark:hover:bg-white/[0.08] dark:hover:text-white'
-        : 'flex w-full min-w-0 items-center gap-3 rounded-[8px] px-2 py-2 text-left text-[#64756c] transition-colors hover:bg-[#edf2ed] hover:text-[#17342e] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8bd78] dark:text-white dark:hover:bg-white/[0.08] dark:hover:text-white';
+      : isRail
+        ? 'mx-auto grid size-9 place-items-center rounded-[8px] text-white/55 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8bd78] lg:size-12'
+        : isCollapsed
+          ? 'mx-auto grid size-11 place-items-center rounded-[8px] text-[#64756c] transition-colors hover:bg-[#edf2ed] hover:text-[#17342e] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8bd78] dark:text-white dark:hover:bg-white/[0.08] dark:hover:text-white'
+          : 'flex w-full min-w-0 items-center gap-3 rounded-[8px] px-2 py-2 text-left text-[#64756c] transition-colors hover:bg-[#edf2ed] hover:text-[#17342e] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8bd78] dark:text-white dark:hover:bg-white/[0.08] dark:hover:text-white';
 
   const changeTheme = (element: HTMLElement, nextIsDark: boolean) => {
     const root = document.documentElement;
@@ -109,12 +112,12 @@ export function HomeFeedAccountMenu({
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <button
             type="button"
             aria-label={`Open profile menu for ${displayName}`}
-            title={isCollapsed ? 'Profile menu' : undefined}
+            title={isCollapsed || isRail ? 'Profile menu' : undefined}
             className={triggerClassName}
           >
             <span
@@ -180,7 +183,8 @@ export function HomeFeedAccountMenu({
             onSelect={(event) => event.preventDefault()}
             onClick={(event) => changeTheme(event.currentTarget, !isDark)}
           >
-            <span>Theme</span>
+            <SunMoon className="size-4" aria-hidden="true" />
+            <span className="mr-auto">Theme</span>
             {themeSwitch}
           </DropdownMenuItem>
           <DropdownMenuItem

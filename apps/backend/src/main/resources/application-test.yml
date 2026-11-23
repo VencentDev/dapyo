@@ -5,3 +5,8 @@ spring:
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:tc:postgresql:16:///backend_test}
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+
+app:
+  auth:
+    jwt:
+      secret: ${APP_AUTH_JWT_SECRET:ZGFweW8tdGVzdC10b2tlbi1rZXktMzItYnl0ZXMtMDA=}

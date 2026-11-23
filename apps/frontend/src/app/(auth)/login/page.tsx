@@ -12,6 +12,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function LoginPage() {
-  return <LoginPageContent />;
+type LoginPageProps = {
+  searchParams: Promise<{ reauth?: string | string[] }>;
+};
+
+export default function LoginPage({ searchParams }: LoginPageProps) {
+  return <LoginPageContent searchParams={searchParams} />;
 }

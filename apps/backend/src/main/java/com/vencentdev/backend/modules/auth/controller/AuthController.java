@@ -3,7 +3,10 @@ package com.vencentdev.backend.modules.auth.controller;
 import com.vencentdev.backend.modules.auth.AuthenticatedUser;
 import com.vencentdev.backend.modules.auth.CurrentUser;
 import com.vencentdev.backend.modules.auth.dto.LoginRequest;
+import com.vencentdev.backend.modules.auth.dto.LoginResponse;
 import com.vencentdev.backend.modules.auth.dto.RegisterRequest;
+import com.vencentdev.backend.modules.auth.service.ApiTokenService;
+import com.vencentdev.backend.modules.auth.service.CredentialsRegistrationService;
 import com.vencentdev.backend.modules.user.dto.UserResponse;
 import com.vencentdev.backend.modules.user.service.UserService;
 import jakarta.validation.Valid;
@@ -18,9 +21,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
   private final UserService users;
+  private final ApiTokenService apiTokens;
+  private final CredentialsRegistrationService registrations;
 
-  public AuthController(UserService users) {
+  public AuthController(
+      UserService users, ApiTokenService apiTokens, CredentialsRegistrationService registrations) {
     this.users = users;
+    this.apiTokens = apiTokens;
+    this.registrations = registrations;
   }
 
   @GetMapping("/me")
@@ -30,11 +38,12 @@ public class AuthController {
 
   @PostMapping("/register")
   public UserResponse register(@Valid @RequestBody RegisterRequest request) {
-    return users.register(request);
+    return registrations.register(request);
   }
 
   @PostMapping("/login")
-  public UserResponse login(@Valid @RequestBody LoginRequest request) {
-    return users.authenticate(request);
+  public LoginResponse login(@Valid @RequestBody LoginRequest request) {
+    UserResponse user = users.authenticate(request);
+    return new LoginResponse(user, apiTokens.issue(user), "Bearer", apiTokens.expiresInSeconds());
   }
 }
