@@ -5,7 +5,10 @@ import { cn } from '@/lib/utils';
 export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn('rounded-[8px] border bg-card text-card-foreground shadow-sm', className)}
+      className={cn(
+        'dapyo-card-elevation rounded-[8px] border bg-card text-card-foreground',
+        className,
+      )}
       {...props}
     />
   );

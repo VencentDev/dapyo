@@ -1,7 +1,7 @@
 import type { Config } from 'tailwindcss';
 
 const config = {
-  darkMode: ['class'],
+  darkMode: 'class',
   content: [
     './src/pages/**/*.{ts,tsx}',
     './src/components/**/*.{ts,tsx}',
@@ -11,58 +11,51 @@ const config = {
     './src/lib/**/*.{ts,tsx}',
   ],
   theme: {
-    container: {
-      center: true,
-      padding: '1rem',
-      screens: {
-        '2xl': '1200px',
-      },
-    },
     extend: {
       colors: {
-        border: 'oklch(var(--border) / <alpha-value>)',
-        input: 'oklch(var(--input) / <alpha-value>)',
-        ring: 'oklch(var(--ring) / <alpha-value>)',
-        background: 'oklch(var(--background) / <alpha-value>)',
-        foreground: 'oklch(var(--foreground) / <alpha-value>)',
+        border: 'oklch(var(--dapyo-border) / <alpha-value>)',
+        input: 'oklch(var(--dapyo-input) / <alpha-value>)',
+        ring: 'oklch(var(--dapyo-ring) / <alpha-value>)',
+        background: 'oklch(var(--dapyo-background) / <alpha-value>)',
+        foreground: 'oklch(var(--dapyo-foreground) / <alpha-value>)',
         primary: {
-          DEFAULT: 'oklch(var(--primary) / <alpha-value>)',
-          foreground: 'oklch(var(--primary-foreground) / <alpha-value>)',
+          DEFAULT: 'oklch(var(--dapyo-primary) / <alpha-value>)',
+          foreground: 'oklch(var(--dapyo-primary-foreground) / <alpha-value>)',
         },
         secondary: {
-          DEFAULT: 'oklch(var(--secondary) / <alpha-value>)',
-          foreground: 'oklch(var(--secondary-foreground) / <alpha-value>)',
+          DEFAULT: 'oklch(var(--dapyo-secondary) / <alpha-value>)',
+          foreground: 'oklch(var(--dapyo-secondary-foreground) / <alpha-value>)',
         },
         destructive: {
-          DEFAULT: 'oklch(var(--destructive) / <alpha-value>)',
-          foreground: 'oklch(var(--destructive-foreground) / <alpha-value>)',
+          DEFAULT: 'oklch(var(--dapyo-destructive) / <alpha-value>)',
+          foreground: 'oklch(var(--dapyo-destructive-foreground) / <alpha-value>)',
         },
         muted: {
-          DEFAULT: 'oklch(var(--muted) / <alpha-value>)',
-          foreground: 'oklch(var(--muted-foreground) / <alpha-value>)',
+          DEFAULT: 'oklch(var(--dapyo-muted) / <alpha-value>)',
+          foreground: 'oklch(var(--dapyo-muted-foreground) / <alpha-value>)',
         },
         accent: {
-          DEFAULT: 'oklch(var(--accent) / <alpha-value>)',
-          foreground: 'oklch(var(--accent-foreground) / <alpha-value>)',
-          alt: 'oklch(var(--accent-alt) / <alpha-value>)',
+          DEFAULT: 'oklch(var(--dapyo-accent) / <alpha-value>)',
+          foreground: 'oklch(var(--dapyo-accent-foreground) / <alpha-value>)',
+          alt: 'oklch(var(--dapyo-accent-alt) / <alpha-value>)',
         },
         popover: {
-          DEFAULT: 'oklch(var(--popover) / <alpha-value>)',
-          foreground: 'oklch(var(--popover-foreground) / <alpha-value>)',
+          DEFAULT: 'oklch(var(--dapyo-popover) / <alpha-value>)',
+          foreground: 'oklch(var(--dapyo-popover-foreground) / <alpha-value>)',
         },
         card: {
-          DEFAULT: 'oklch(var(--card) / <alpha-value>)',
-          foreground: 'oklch(var(--card-foreground) / <alpha-value>)',
+          DEFAULT: 'oklch(var(--dapyo-card) / <alpha-value>)',
+          foreground: 'oklch(var(--dapyo-card-foreground) / <alpha-value>)',
         },
       },
       fontFamily: {
-        display: ['var(--font-manrope)', 'Manrope', 'sans-serif'],
-        mono: ['var(--font-ibm-plex-mono)', 'IBM Plex Mono', 'monospace'],
+        display: ['var(--font-figtree)', 'Figtree', 'sans-serif'],
+        mono: ['var(--font-geist-mono)', 'Geist Mono', 'monospace'],
       },
       borderRadius: {
-        lg: 'var(--radius)',
-        md: 'var(--radius)',
-        sm: 'var(--radius)',
+        lg: 'var(--dapyo-radius)',
+        md: 'var(--dapyo-radius)',
+        sm: 'var(--dapyo-radius)',
       },
       keyframes: {
         'accordion-down': {
@@ -91,7 +84,6 @@ const config = {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
 } satisfies Config;
 
 export default config;
