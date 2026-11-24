@@ -1,10 +1,12 @@
 package com.vencentdev.backend.modules.user.service;
 
+import com.vencentdev.backend.common.exception.BadRequestException;
 import com.vencentdev.backend.common.exception.ConflictException;
 import com.vencentdev.backend.common.exception.ResourceNotFoundException;
 import com.vencentdev.backend.modules.auth.AuthenticatedUser;
 import com.vencentdev.backend.modules.auth.dto.LoginRequest;
 import com.vencentdev.backend.modules.auth.dto.RegisterRequest;
+import com.vencentdev.backend.modules.user.dto.PublicUserSearchResponse;
 import com.vencentdev.backend.modules.user.dto.UserResponse;
 import com.vencentdev.backend.modules.user.dto.UserUpdateRequest;
 import com.vencentdev.backend.modules.user.entity.User;
@@ -13,6 +15,7 @@ import com.vencentdev.backend.modules.user.enums.Role;
 import com.vencentdev.backend.modules.user.enums.UserType;
 import com.vencentdev.backend.modules.user.mapper.UserMapper;
 import com.vencentdev.backend.modules.user.repository.UserRepository;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -96,6 +99,24 @@ public class UserServiceImpl implements UserService {
     User user = findByPrincipal(principal);
     mapper.applyUpdate(request, user);
     return mapper.toResponse(user);
+  }
+
+  @Override
+  @Transactional
+  public List<PublicUserSearchResponse> searchPublicProfiles(
+      AuthenticatedUser principal, String query) {
+    String normalizedQuery = query == null ? "" : query.trim();
+    if (normalizedQuery.length() < 2) {
+      throw new BadRequestException("Search query must contain at least two characters");
+    }
+
+    UUID callerId = resolveInternalId(principal);
+    return repository
+        .findTop20ByIdNotAndDisplayNameContainingIgnoreCaseOrderByDisplayNameAsc(
+            callerId, normalizedQuery)
+        .stream()
+        .map(user -> new PublicUserSearchResponse(user.getId(), user.getDisplayName(), null))
+        .toList();
   }
 
   @Override
