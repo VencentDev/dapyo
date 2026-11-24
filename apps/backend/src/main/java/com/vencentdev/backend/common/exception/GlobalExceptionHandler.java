@@ -8,12 +8,14 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
@@ -27,6 +29,15 @@ public class GlobalExceptionHandler {
             .map(error -> new ApiError.FieldError(error.getField(), error.getDefaultMessage()))
             .toList();
     return error(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Validation failed", errors);
+  }
+
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  ResponseEntity<ApiError> handleUnreadableRequest(HttpMessageNotReadableException exception) {
+    return error(
+        HttpStatus.BAD_REQUEST,
+        "INVALID_REQUEST_BODY",
+        "Request body contains invalid or unsupported values",
+        List.of());
   }
 
   @ExceptionHandler(ConstraintViolationException.class)
@@ -54,6 +65,15 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(BadRequestException.class)
   ResponseEntity<ApiError> handleBadRequest(BadRequestException exception) {
     return error(HttpStatus.BAD_REQUEST, "BAD_REQUEST", exception.getMessage(), List.of());
+  }
+
+  @ExceptionHandler(MaxUploadSizeExceededException.class)
+  ResponseEntity<ApiError> handleUploadTooLarge(MaxUploadSizeExceededException exception) {
+    return error(
+        HttpStatus.PAYLOAD_TOO_LARGE,
+        "UPLOAD_TOO_LARGE",
+        "Each image must be 10 MB or smaller",
+        List.of());
   }
 
   @ExceptionHandler(ForbiddenException.class)

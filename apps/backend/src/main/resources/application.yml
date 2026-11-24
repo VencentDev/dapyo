@@ -7,6 +7,10 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD:postgres}
   flyway:
     baseline-on-migrate: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 11MB
   jpa:
     hibernate:
       ddl-auto: validate
@@ -28,6 +32,8 @@ app:
       enabled: ${APP_RATE_LIMIT_AUTH_ENABLED:true}
       capacity: ${APP_RATE_LIMIT_AUTH_CAPACITY:60}
       refill-period: ${APP_RATE_LIMIT_AUTH_REFILL_PERIOD:1m}
+  hikes:
+    media-dir: ${APP_HIKES_MEDIA_DIR:${user.home}/.dapyo/hike-images}
 
 management:
   endpoints:
