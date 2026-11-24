@@ -293,6 +293,669 @@
           }
         ]
       }
+    },
+    "/api/v1/users/search": {
+      "get": {
+        "operationId": "searchPublicProfiles",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Up to 20 public profiles matching the display name",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicUserSearchResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/trailmates": {
+      "get": {
+        "operationId": "getTrailmates",
+        "responses": {
+          "200": {
+            "description": "Accepted Trailmates connections",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrailmateResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/trailmates/requests": {
+      "get": {
+        "operationId": "getTrailmateRequests",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrailmateRequestsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "sendTrailmateRequest",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrailmateRequestCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrailmateRequestResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/trailmates/requests/{id}/accept": {
+      "post": {
+        "operationId": "acceptTrailmateRequest",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/trailmates/requests/{id}/decline": {
+      "post": {
+        "operationId": "declineTrailmateRequest",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/trailmates/{userId}": {
+      "delete": {
+        "operationId": "removeTrailmate",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/hikes": {
+      "get": {
+        "operationId": "getUpcomingHikes",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponseHikeSummaryResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createHike",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HikeCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HikeDetailResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/hikes/{id}": {
+      "get": {
+        "operationId": "getHike",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HikeDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/hikes/{id}/join": {
+      "post": {
+        "operationId": "joinHike",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HikeDetailResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/hikes/{id}/join-requests": {
+      "get": {
+        "operationId": "getHikeJoinRequests",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pending join requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HikeJoinRequestResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/hikes/{id}/join-requests/{userId}/accept": {
+      "post": {
+        "operationId": "acceptHikeJoinRequest",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HikeDetailResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/hikes/{id}/join-requests/{userId}/decline": {
+      "post": {
+        "operationId": "declineHikeJoinRequest",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/hikes/{id}/members": {
+      "post": {
+        "operationId": "addHikeTrailmate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HikeMemberAddRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HikeDetailResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/hikes/{id}/guests": {
+      "patch": {
+        "operationId": "updateHikeGuestCount",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HikeGuestCountUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HikeDetailResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/hikes/{id}/images": {
+      "post": {
+        "operationId": "uploadHikeImage",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["file"],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "caption": {
+                    "type": "string",
+                    "maxLength": 500
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HikeImageResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Image exceeds the 10 MB limit"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/hikes/{id}/images/{imageId}": {
+      "get": {
+        "operationId": "downloadHikeImage",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "imageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Image bytes from a published hike",
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/webp": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteHikeImage",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "imageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -471,6 +1134,487 @@
           "displayName": {
             "type": ["string", "null"],
             "maxLength": 120
+          }
+        }
+      },
+      "PublicUserSearchResponse": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "displayName": {
+            "type": ["string", "null"]
+          },
+          "avatarUrl": {
+            "type": ["string", "null"]
+          }
+        }
+      },
+      "TrailmateResponse": {
+        "type": "object",
+        "required": ["userId", "connectedAt"],
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "displayName": {
+            "type": ["string", "null"]
+          },
+          "avatarUrl": {
+            "type": ["string", "null"]
+          },
+          "connectedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "TrailmateRequestResponse": {
+        "type": "object",
+        "required": ["id", "userId", "requestedAt"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "displayName": {
+            "type": ["string", "null"]
+          },
+          "avatarUrl": {
+            "type": ["string", "null"]
+          },
+          "requestedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "TrailmateRequestsResponse": {
+        "type": "object",
+        "required": ["incoming", "outgoing"],
+        "properties": {
+          "incoming": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrailmateRequestResponse"
+            }
+          },
+          "outgoing": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrailmateRequestResponse"
+            }
+          }
+        }
+      },
+      "TrailmateRequestCreateRequest": {
+        "type": "object",
+        "required": ["userId"],
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "HikeAdmissionMode": {
+        "type": "string",
+        "enum": ["OPEN", "APPROVAL"]
+      },
+      "HikeViewerStatus": {
+        "type": "string",
+        "enum": ["HOST", "JOINED", "PENDING", "NOT_JOINED"]
+      },
+      "TrailDifficulty": {
+        "type": "string",
+        "enum": ["EASY", "MODERATE", "CHALLENGING"]
+      },
+      "PageResponseHikeSummaryResponse": {
+        "type": "object",
+        "required": ["content", "page", "size", "totalElements", "totalPages"],
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HikeSummaryResponse"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "HikeCreateRequest": {
+        "type": "object",
+        "required": [
+          "locationName",
+          "mountainName",
+          "latitude",
+          "longitude",
+          "scheduledStartAt",
+          "difficulty",
+          "maxParticipants",
+          "initialMemberIds",
+          "externalGuestCount",
+          "admissionMode",
+          "description"
+        ],
+        "properties": {
+          "locationName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "mountainName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "distanceKm": {
+            "type": ["number", "null"],
+            "minimum": 0.1,
+            "maximum": 99999.99
+          },
+          "latitude": {
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90
+          },
+          "longitude": {
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180
+          },
+          "scheduledStartAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "difficulty": {
+            "$ref": "#/components/schemas/TrailDifficulty"
+          },
+          "maxParticipants": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1
+          },
+          "initialMemberIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "externalGuestCount": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "admissionMode": {
+            "$ref": "#/components/schemas/HikeAdmissionMode"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          },
+          "requirements": {
+            "type": ["string", "null"],
+            "maxLength": 4000
+          }
+        }
+      },
+      "HikeMemberAddRequest": {
+        "type": "object",
+        "required": ["userId"],
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "HikeGuestCountUpdateRequest": {
+        "type": "object",
+        "required": ["externalGuestCount"],
+        "properties": {
+          "externalGuestCount": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "PublicHikerResponse": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "displayName": {
+            "type": ["string", "null"]
+          },
+          "avatarUrl": {
+            "type": ["string", "null"]
+          }
+        }
+      },
+      "HikeParticipantResponse": {
+        "type": "object",
+        "required": ["userId"],
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "displayName": {
+            "type": ["string", "null"]
+          },
+          "avatarUrl": {
+            "type": ["string", "null"]
+          },
+          "joinedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "HikeImageResponse": {
+        "type": "object",
+        "required": ["imageId", "url", "mimeType", "byteSize", "displayOrder"],
+        "properties": {
+          "imageId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "url": {
+            "type": "string"
+          },
+          "caption": {
+            "type": ["string", "null"]
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "byteSize": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "displayOrder": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "HikeJoinRequestResponse": {
+        "type": "object",
+        "required": ["userId", "requestedAt"],
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "displayName": {
+            "type": ["string", "null"]
+          },
+          "avatarUrl": {
+            "type": ["string", "null"]
+          },
+          "requestedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "HikeSummaryResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "locationName",
+          "mountainName",
+          "distanceKm",
+          "latitude",
+          "longitude",
+          "scheduledStartAt",
+          "difficulty",
+          "maxParticipants",
+          "joinedMemberCount",
+          "externalGuestCount",
+          "availablePlaces",
+          "admissionMode",
+          "organizer"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "locationName": {
+            "type": "string"
+          },
+          "mountainName": {
+            "type": "string"
+          },
+          "distanceKm": {
+            "type": ["number", "null"]
+          },
+          "latitude": {
+            "type": "number"
+          },
+          "longitude": {
+            "type": "number"
+          },
+          "scheduledStartAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "difficulty": {
+            "$ref": "#/components/schemas/TrailDifficulty"
+          },
+          "maxParticipants": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "joinedMemberCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "externalGuestCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "availablePlaces": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "admissionMode": {
+            "$ref": "#/components/schemas/HikeAdmissionMode"
+          },
+          "organizer": {
+            "$ref": "#/components/schemas/PublicHikerResponse"
+          }
+        }
+      },
+      "HikeDetailResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "locationName",
+          "mountainName",
+          "distanceKm",
+          "latitude",
+          "longitude",
+          "scheduledStartAt",
+          "difficulty",
+          "maxParticipants",
+          "joinedMemberCount",
+          "externalGuestCount",
+          "availablePlaces",
+          "admissionMode",
+          "description",
+          "organizer",
+          "participants",
+          "images"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "locationName": {
+            "type": "string"
+          },
+          "mountainName": {
+            "type": "string"
+          },
+          "distanceKm": {
+            "type": ["number", "null"]
+          },
+          "latitude": {
+            "type": "number"
+          },
+          "longitude": {
+            "type": "number"
+          },
+          "scheduledStartAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "difficulty": {
+            "$ref": "#/components/schemas/TrailDifficulty"
+          },
+          "maxParticipants": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "joinedMemberCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "externalGuestCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "availablePlaces": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "admissionMode": {
+            "$ref": "#/components/schemas/HikeAdmissionMode"
+          },
+          "description": {
+            "type": "string"
+          },
+          "requirements": {
+            "type": ["string", "null"]
+          },
+          "organizer": {
+            "$ref": "#/components/schemas/PublicHikerResponse"
+          },
+          "participants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HikeParticipantResponse"
+            }
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HikeImageResponse"
+            }
+          },
+          "currentUserStatus": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/HikeViewerStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         }
       }
