@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { CalendarDays, ChevronRight, Compass, MapPin } from 'lucide-react';
 
-import { popularTrails } from '@/features/home/feed/lib/home-feed-preview';
+import { popularTrails } from '@/features/hikes/create/lib/mountain-suggestions';
 
 export function HomeFeedSidebar({
   displayName,
@@ -14,7 +14,7 @@ export function HomeFeedSidebar({
     <aside className="space-y-4 xl:sticky xl:top-24 xl:self-start">
       <section
         id="discover"
-        className="scroll-mt-24 rounded-[8px] bg-white p-4 shadow-sm ring-1 ring-[#17342e]/[0.06] dark:bg-[#17342e] dark:ring-white/[0.08]"
+        className="dapyo-card-elevation scroll-mt-24 rounded-[8px] bg-white p-4 ring-1 ring-[#17342e]/[0.06] dark:bg-[#17342e] dark:ring-white/[0.08]"
       >
         <div className="flex items-center justify-between">
           <div>
@@ -48,13 +48,13 @@ export function HomeFeedSidebar({
           ))}
         </div>
         <p className="mt-3 border-t border-[#edf0ec] pt-3 text-[10px] leading-5 text-[#89968e] dark:border-white/10 dark:text-white/50">
-          Hike discovery is being connected to the live trail catalog.
+          Browse upcoming community hikes and find a group to join.
         </p>
       </section>
 
       <section
         id="my-hikes"
-        className="scroll-mt-24 rounded-[8px] bg-[#e5ede6] p-4 ring-1 ring-[#17342e]/[0.04] dark:bg-[#1d4037] dark:ring-white/[0.06]"
+        className="dapyo-card-elevation scroll-mt-24 rounded-[8px] bg-[#e5ede6] p-4 ring-1 ring-[#17342e]/[0.04] dark:bg-[#1d4037] dark:ring-white/[0.06]"
       >
         <div className="flex items-center gap-2 text-[#31533f] dark:text-white/85">
           <CalendarDays className="size-4" aria-hidden="true" />
@@ -64,23 +64,26 @@ export function HomeFeedSidebar({
           Your joined and completed hikes will collect here.
         </p>
         <Link
-          href="#discover"
+          href="/discover"
           className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#286044] hover:text-[#a16d35] dark:text-[#e8bd78] dark:hover:text-white"
         >
-          Browse popular trails <ChevronRight className="size-3.5" aria-hidden="true" />
+          Browse upcoming hikes <ChevronRight className="size-3.5" aria-hidden="true" />
         </Link>
       </section>
 
       <section
         id="profile"
-        className="scroll-mt-24 rounded-[8px] bg-white p-4 shadow-sm ring-1 ring-[#17342e]/[0.06] dark:bg-[#17342e] dark:ring-white/[0.08]"
+        className="dapyo-card-elevation scroll-mt-24 rounded-[8px] bg-white p-4 ring-1 ring-[#17342e]/[0.06] dark:bg-[#17342e] dark:ring-white/[0.08]"
       >
         <div className="flex items-center gap-3">
           <span className="grid size-10 place-items-center rounded-full bg-[#dce9df] text-sm font-bold text-[#1d604c] dark:bg-white/10 dark:text-[#dfece3]">
             {initials}
           </span>
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-[#263d33] dark:text-white">
+            <p
+              className="truncate text-sm font-semibold"
+              style={{ color: 'var(--dapyo-color-foreground)' }}
+            >
               {displayName}
             </p>
             <p className="text-[10px] text-[#89968e] dark:text-white/50">Your trail profile</p>
