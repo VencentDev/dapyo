@@ -4,6 +4,7 @@ import Image from 'next/image';
 import {
   Activity,
   Clock3,
+  Footprints,
   Heart,
   ImagePlus,
   MapPin,
@@ -50,6 +51,8 @@ export function ActivityFeedPost({
   onSelectedHikersChange,
   attachedImageUrl,
   onImageChange,
+  difficultyRating,
+  onDifficultyRatingChange,
 }: {
   post: ActivityPreview;
   embedded?: boolean;
@@ -73,6 +76,8 @@ export function ActivityFeedPost({
   onSelectedHikersChange?: (hikers: HikeJoinedHiker[]) => void;
   attachedImageUrl?: string | null;
   onImageChange?: (file: File | null) => void;
+  difficultyRating?: number;
+  onDifficultyRatingChange?: (rating: number) => void;
 }) {
   const displayAuthorName = authorName?.trim() || post.author;
   const authorInitials = displayAuthorName
@@ -229,7 +234,11 @@ export function ActivityFeedPost({
         )}
       </div>
 
-      <div className="relative aspect-[16/9] max-h-[410px] w-full overflow-hidden bg-[#dce5dc] dark:bg-[#10231f] sm:aspect-[2/1]">
+      <div
+        className={`relative w-full overflow-hidden bg-[#dce5dc] dark:bg-[#10231f] ${
+          onImageChange ? 'h-[320px] sm:h-[410px]' : 'aspect-[16/9] max-h-[410px] sm:aspect-[2/1]'
+        }`}
+      >
         {onImageChange ? (
           <>
             {attachedImageUrl ? (
@@ -239,7 +248,7 @@ export function ActivityFeedPost({
                 fill
                 unoptimized
                 sizes="(min-width: 1280px) 620px, (min-width: 768px) 70vw, 100vw"
-                className="object-cover"
+                className="object-contain"
               />
             ) : (
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.42),_transparent_58%),linear-gradient(145deg,_#e9f0e8,_#d9e4dc)] dark:bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.08),_transparent_58%),linear-gradient(145deg,_#1d3a30,_#10231f)]" />
@@ -295,11 +304,53 @@ export function ActivityFeedPost({
         )}
       </div>
 
-      <div className="grid grid-cols-3 border-b border-[#edf0ec] px-4 py-3 text-center dark:border-white/10 sm:px-5">
-        <FeedMetric icon={TrendingUp} value={post.distance} label="Distance" />
-        <FeedMetric icon={Clock3} value={post.duration} label="Moving time" />
-        <FeedMetric icon={Activity} value={post.elevation} label="Elevation" />
-      </div>
+      {onDifficultyRatingChange ? (
+        <div className="flex min-h-[76px] items-center justify-between gap-4 border-b border-[#edf0ec] px-4 py-3 dark:border-white/10 sm:px-5">
+          <div className="flex min-w-0 items-center gap-3">
+            <div>
+              <p className="text-xs font-semibold text-[#3e5748] dark:text-[#dfece3]">
+                Trail difficulty
+              </p>
+              <div
+                className="mt-1 flex items-center gap-0.5"
+                role="group"
+                aria-label="Trail difficulty"
+              >
+                {[1, 2, 3, 4, 5].map((level) => (
+                  <button
+                    key={level}
+                    type="button"
+                    aria-label={`Set difficulty to ${level} out of 5`}
+                    aria-pressed={difficultyRating === level}
+                    onClick={() => onDifficultyRatingChange(level)}
+                    className="grid size-8 place-items-center rounded-full transition-colors hover:bg-[#edf5ee] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d604c]/30 dark:hover:bg-white/[0.08]"
+                  >
+                    <Footprints
+                      className={`size-[18px] ${level <= (difficultyRating ?? 3) ? 'text-[#1d604c] dark:text-[#b9d8c2]' : 'text-[#aab6ad] dark:text-white/30'}`}
+                      aria-hidden="true"
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+            <span className="mt-4 shrink-0 text-[11px] font-medium text-[#718176] dark:text-white/55">
+              {difficultyRating ?? 3} / 5
+            </span>
+          </div>
+          <button
+            type="button"
+            className="inline-flex h-10 shrink-0 items-center justify-center rounded-full bg-[#1d604c] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#174c3d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d9aa58]"
+          >
+            Post
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-3 border-b border-[#edf0ec] px-4 py-3 text-center dark:border-white/10 sm:px-5">
+          <FeedMetric icon={TrendingUp} value={post.distance} label="Distance" />
+          <FeedMetric icon={Clock3} value={post.duration} label="Moving time" />
+          <FeedMetric icon={Activity} value={post.elevation} label="Elevation" />
+        </div>
+      )}
 
       {!embedded && (
         <div className="flex items-center justify-between px-4 py-3 text-xs text-[#819087] dark:text-white/55 sm:px-5">

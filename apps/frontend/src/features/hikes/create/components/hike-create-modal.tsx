@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 
 import { LocationPickerDialog } from './location-picker-dialog';
 import { type HikeAdmissionMode } from './hike-admission-menu';
+import { HikeImageCropDialog } from './hike-image-crop-dialog';
 import type { HikeJoinedHiker } from '../lib/hike-joined-hiker';
 import type { HikeLocationSelection } from '../lib/hike-location';
 
@@ -27,11 +28,14 @@ export function HikeCreateModal({
   const [caption, setCaption] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
+  const [isImageCropOpen, setIsImageCropOpen] = useState(false);
   const [mountainName, setMountainName] = useState('');
   const [maxParticipants, setMaxParticipants] = useState('10');
   const [selectedHikers, setSelectedHikers] = useState<HikeJoinedHiker[]>([]);
   const [isLocationPickerOpen, setIsLocationPickerOpen] = useState(false);
   const [admissionMode, setAdmissionMode] = useState<HikeAdmissionMode>('OPEN');
+  const [difficultyRating, setDifficultyRating] = useState(3);
   const [scheduledDate, setScheduledDate] = useState<DateValue | null>(null);
   const [datePickerPortalContainer, setDatePickerPortalContainer] = useState<HTMLDivElement | null>(
     null,
@@ -82,7 +86,13 @@ export function HikeCreateModal({
             selectedHikers={selectedHikers}
             onSelectedHikersChange={setSelectedHikers}
             attachedImageUrl={imagePreviewUrl}
-            onImageChange={setImageFile}
+            onImageChange={(file) => {
+              if (!file) return;
+              setPendingImageFile(file);
+              setIsImageCropOpen(true);
+            }}
+            difficultyRating={difficultyRating}
+            onDifficultyRatingChange={setDifficultyRating}
             authorName={displayName}
             authorAvatarUrl={session?.user?.image}
             caption={caption}
@@ -109,6 +119,18 @@ export function HikeCreateModal({
         onOpenChange={setIsLocationPickerOpen}
         initialLocation={location}
         onSelect={setLocation}
+      />
+      <HikeImageCropDialog
+        open={isImageCropOpen}
+        imageFile={pendingImageFile}
+        onOpenChange={(open) => {
+          setIsImageCropOpen(open);
+          if (!open) setPendingImageFile(null);
+        }}
+        onApply={(file) => {
+          setImageFile(file);
+          setPendingImageFile(null);
+        }}
       />
     </Dialog>
   );
