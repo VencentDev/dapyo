@@ -28,7 +28,7 @@ export function HikeAdmissionMenu({
         <button
           type="button"
           aria-label={`Join settings: ${mode === 'OPEN' ? 'anyone can join' : 'approval required'}`}
-          className="grid size-7 shrink-0 place-items-center rounded-full text-[#17342e] transition-colors hover:bg-[#edf5ee] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d604c]/30 dark:text-[#b9d8c2] dark:hover:bg-white/[0.08]"
+          className="grid size-6 shrink-0 place-items-center rounded-full text-[#17342e] transition-colors hover:bg-[#edf5ee] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d604c]/30 dark:text-[#b9d8c2] dark:hover:bg-white/[0.08]"
         >
           <AdmissionIcon className="size-3.5" aria-hidden="true" />
         </button>

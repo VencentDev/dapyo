@@ -114,7 +114,7 @@ export function ActivityFeedPost({
           )}
         </span>
         <div className="-mt-1 min-w-0 flex-1">
-          <div className="flex min-w-0 flex-nowrap items-end gap-x-1">
+          <div className="flex min-w-0 flex-nowrap items-center gap-x-1.5">
             <h3 className="min-w-0 max-w-full truncate text-sm font-semibold leading-5 text-[#253b32] dark:text-white">
               {displayAuthorName}
             </h3>
