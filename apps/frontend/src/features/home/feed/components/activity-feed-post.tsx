@@ -301,16 +301,18 @@ export function ActivityFeedPost({
         <FeedMetric icon={Activity} value={post.elevation} label="Elevation" />
       </div>
 
-      <div className="flex items-center justify-between px-4 py-3 text-xs text-[#819087] dark:text-white/55 sm:px-5">
-        <span className="inline-flex items-center gap-1.5">
-          <Heart className="size-3.5 fill-[#d99a6a] text-[#d99a6a]" aria-hidden="true" />
-          {post.likes} hikers appreciated this
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <MessageCircle className="size-3.5" aria-hidden="true" />
-          {post.comments} comments
-        </span>
-      </div>
+      {!embedded && (
+        <div className="flex items-center justify-between px-4 py-3 text-xs text-[#819087] dark:text-white/55 sm:px-5">
+          <span className="inline-flex items-center gap-1.5">
+            <Heart className="size-3.5 fill-[#d99a6a] text-[#d99a6a]" aria-hidden="true" />
+            {post.likes} hikers appreciated this
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <MessageCircle className="size-3.5" aria-hidden="true" />
+            {post.comments} comments
+          </span>
+        </div>
+      )}
     </article>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { Globe, Lock, Settings2 } from 'lucide-react';
+import { Globe, Lock } from 'lucide-react';
 
 import {
   DropdownMenu,
@@ -20,6 +20,8 @@ export function HikeAdmissionMenu({
   mode: HikeAdmissionMode;
   onChange: (mode: HikeAdmissionMode) => void;
 }) {
+  const AdmissionIcon = mode === 'OPEN' ? Globe : Lock;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -28,7 +30,7 @@ export function HikeAdmissionMenu({
           aria-label={`Join settings: ${mode === 'OPEN' ? 'anyone can join' : 'approval required'}`}
           className="grid size-7 shrink-0 place-items-center rounded-full text-[#17342e] transition-colors hover:bg-[#edf5ee] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d604c]/30 dark:text-[#b9d8c2] dark:hover:bg-white/[0.08]"
         >
-          <Settings2 className="size-3.5" aria-hidden="true" />
+          <AdmissionIcon className="size-3.5" aria-hidden="true" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-72 border-[#dce5dc] dark:border-white/10">
