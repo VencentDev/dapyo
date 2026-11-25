@@ -5,6 +5,7 @@ import {
   Activity,
   Clock3,
   Heart,
+  ImagePlus,
   MapPin,
   MessageCircle,
   Mountain,
@@ -47,6 +48,8 @@ export function ActivityFeedPost({
   onMaxParticipantsChange,
   selectedHikers,
   onSelectedHikersChange,
+  attachedImageUrl,
+  onImageChange,
 }: {
   post: ActivityPreview;
   embedded?: boolean;
@@ -68,6 +71,8 @@ export function ActivityFeedPost({
   onMaxParticipantsChange?: (value: string) => void;
   selectedHikers?: HikeJoinedHiker[];
   onSelectedHikersChange?: (hikers: HikeJoinedHiker[]) => void;
+  attachedImageUrl?: string | null;
+  onImageChange?: (file: File | null) => void;
 }) {
   const displayAuthorName = authorName?.trim() || post.author;
   const authorInitials = displayAuthorName
@@ -184,11 +189,11 @@ export function ActivityFeedPost({
               onChange={onMountainNameChange}
               error={mountainNameError}
             />
-            <label className="block space-y-1.5">
-              <span className="text-sm font-medium text-[#354b3e] dark:text-white/80">
+            <label className="grid min-w-0 grid-rows-[20px_40px] gap-y-1.5">
+              <span className="h-5 leading-5 text-sm font-medium text-[#354b3e] dark:text-white/80">
                 Capacity
               </span>
-              <span className="relative block">
+              <span className="relative block h-10">
                 <UsersRound
                   className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#a77845] dark:text-[#e8bd78]"
                   aria-hidden="true"
@@ -204,8 +209,8 @@ export function ActivityFeedPost({
                 />
               </span>
             </label>
-            <div className="min-w-0 space-y-1.5">
-              <span className="block text-sm font-medium text-[#354b3e] dark:text-white/80">
+            <div className="grid min-w-0 grid-rows-[20px_40px] gap-y-1.5">
+              <span className="h-5 leading-5 text-sm font-medium text-[#354b3e] dark:text-white/80">
                 Already taken
               </span>
               <p
@@ -225,13 +230,69 @@ export function ActivityFeedPost({
       </div>
 
       <div className="relative aspect-[16/9] max-h-[410px] w-full overflow-hidden bg-[#dce5dc] dark:bg-[#10231f] sm:aspect-[2/1]">
-        <Image
-          src={post.image}
-          alt={post.imageAlt}
-          fill
-          sizes="(min-width: 1280px) 620px, (min-width: 768px) 70vw, 100vw"
-          className="object-cover"
-        />
+        {onImageChange ? (
+          <>
+            {attachedImageUrl ? (
+              <Image
+                src={attachedImageUrl}
+                alt="Hike image preview"
+                fill
+                unoptimized
+                sizes="(min-width: 1280px) 620px, (min-width: 768px) 70vw, 100vw"
+                className="object-cover"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.42),_transparent_58%),linear-gradient(145deg,_#e9f0e8,_#d9e4dc)] dark:bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.08),_transparent_58%),linear-gradient(145deg,_#1d3a30,_#10231f)]" />
+            )}
+            <label
+              className={`absolute inset-0 grid cursor-pointer place-items-center transition-colors focus-within:ring-2 focus-within:ring-inset focus-within:ring-[#e8bd78] ${
+                attachedImageUrl
+                  ? 'items-end justify-start bg-gradient-to-t from-black/55 via-transparent to-transparent p-4'
+                  : 'border-2 border-dashed border-[#9fb4a2] bg-transparent hover:bg-white/15 dark:border-white/25 dark:hover:bg-white/[0.04]'
+              }`}
+            >
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                aria-label={attachedImageUrl ? 'Change attached hike image' : 'Attach hike image'}
+                className="sr-only"
+                onChange={(event) => {
+                  const file = event.currentTarget.files?.[0];
+                  if (file) onImageChange(file);
+                  event.currentTarget.value = '';
+                }}
+              />
+              {attachedImageUrl ? (
+                <span className="inline-flex items-center gap-2 rounded-full bg-black/60 px-3 py-2 text-xs font-semibold text-white backdrop-blur-sm">
+                  <ImagePlus className="size-4" aria-hidden="true" />
+                  Change image
+                </span>
+              ) : (
+                <span className="flex flex-col items-center gap-3 text-center">
+                  <span className="grid size-14 place-items-center rounded-full border border-white/80 bg-white/75 text-[#1d604c] shadow-sm backdrop-blur-sm dark:border-white/15 dark:bg-white/[0.08] dark:text-[#cde5d3]">
+                    <ImagePlus className="size-6" aria-hidden="true" />
+                  </span>
+                  <span>
+                    <span className="block text-sm font-semibold text-[#31533f] dark:text-white/85">
+                      Attach image
+                    </span>
+                    <span className="mt-1 block text-xs text-[#68796e] dark:text-white/55">
+                      JPG, PNG, or WebP
+                    </span>
+                  </span>
+                </span>
+              )}
+            </label>
+          </>
+        ) : (
+          <Image
+            src={post.image}
+            alt={post.imageAlt}
+            fill
+            sizes="(min-width: 1280px) 620px, (min-width: 768px) 70vw, 100vw"
+            className="object-cover"
+          />
+        )}
       </div>
 
       <div className="grid grid-cols-3 border-b border-[#edf0ec] px-4 py-3 text-center dark:border-white/10 sm:px-5">

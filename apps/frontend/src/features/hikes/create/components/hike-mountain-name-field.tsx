@@ -24,9 +24,9 @@ export function HikeMountainNameField({
       validationBehavior="aria"
       menuTrigger="focus"
       fullWidth
-      className="w-full gap-1.5"
+      className="grid w-full grid-rows-[20px_40px] gap-y-1.5"
     >
-      <Label className="text-sm font-medium text-[#354b3e] dark:text-white/80">
+      <Label className="h-5 leading-5 text-sm font-medium text-[#354b3e] dark:text-white/80">
         Mountain or trail name
       </Label>
       <ComboBox.InputGroup className="relative h-10 w-full">

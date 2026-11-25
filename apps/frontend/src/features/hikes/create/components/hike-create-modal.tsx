@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import type { DateValue } from '@heroui/react';
 
@@ -25,6 +25,8 @@ export function HikeCreateModal({
   const { data: session } = useSession();
   const [location, setLocation] = useState<HikeLocationSelection | null>(null);
   const [caption, setCaption] = useState('');
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [mountainName, setMountainName] = useState('');
   const [maxParticipants, setMaxParticipants] = useState('10');
   const [selectedHikers, setSelectedHikers] = useState<HikeJoinedHiker[]>([]);
@@ -35,6 +37,17 @@ export function HikeCreateModal({
     null,
   );
   const displayName = session?.user?.name?.trim() || 'You';
+
+  useEffect(() => {
+    if (!imageFile) {
+      setImagePreviewUrl(null);
+      return;
+    }
+
+    const previewUrl = URL.createObjectURL(imageFile);
+    setImagePreviewUrl(previewUrl);
+    return () => URL.revokeObjectURL(previewUrl);
+  }, [imageFile]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -68,6 +81,8 @@ export function HikeCreateModal({
             onLocationClick={() => setIsLocationPickerOpen(true)}
             selectedHikers={selectedHikers}
             onSelectedHikersChange={setSelectedHikers}
+            attachedImageUrl={imagePreviewUrl}
+            onImageChange={setImageFile}
             authorName={displayName}
             authorAvatarUrl={session?.user?.image}
             caption={caption}
