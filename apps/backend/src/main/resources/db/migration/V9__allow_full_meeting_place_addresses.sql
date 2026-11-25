@@ -1,0 +1,2 @@
+ALTER TABLE hikes
+  ALTER COLUMN location_name TYPE VARCHAR(500);

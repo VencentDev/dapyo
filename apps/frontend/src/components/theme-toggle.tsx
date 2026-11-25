@@ -5,6 +5,7 @@ import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { changeThemeWithReveal } from '@/lib/theme-transition';
 
 export function ThemeToggle({ className }: { className?: string }) {
   const { resolvedTheme, setTheme } = useTheme();
@@ -23,7 +24,9 @@ export function ThemeToggle({ className }: { className?: string }) {
       variant="ghost"
       className={className}
       disabled={!mounted}
-      onClick={() => setTheme(nextTheme)}
+      onClick={(event) =>
+        changeThemeWithReveal(event.currentTarget, nextTheme, () => setTheme(nextTheme))
+      }
     >
       <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
       <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />

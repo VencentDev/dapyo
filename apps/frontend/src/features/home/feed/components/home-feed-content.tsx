@@ -1,5 +1,6 @@
-import { Heart, MapPin, Mountain, Plus } from 'lucide-react';
+import { Heart, MapPin, Mountain } from 'lucide-react';
 
+import { HikeOrganizerLauncher } from '@/features/hikes/create/components/hike-organizer-launcher';
 import { ActivityFeedPost } from '@/features/home/feed/components/activity-feed-post';
 import { HomeFeedNavigation } from '@/features/home/feed/components/home-feed-navigation';
 import { HomeFeedSearch } from '@/features/home/feed/components/home-feed-search';
@@ -33,7 +34,7 @@ export function HomeFeedContent({ displayName }: { displayName: string }) {
 
           <section
             id="community"
-            className="mb-5 rounded-[8px] bg-white p-4 shadow-sm ring-1 ring-[#17342e]/[0.06] dark:bg-[#17342e] dark:ring-white/[0.08] sm:p-5"
+            className="dapyo-card-elevation mb-5 rounded-[8px] bg-white p-4 ring-1 ring-[#17342e]/[0.06] dark:bg-[#17342e] dark:ring-white/[0.08] sm:p-5"
             aria-label="Share a hiking update"
           >
             <div className="flex items-center gap-3">
@@ -48,9 +49,7 @@ export function HomeFeedContent({ displayName }: { displayName: string }) {
                   Activity sharing will appear here when it is connected.
                 </p>
               </div>
-              <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[#f6f2e9] text-[#a5743c] dark:bg-white/[0.08] dark:text-[#e8bd78]">
-                <Plus className="size-4" aria-hidden="true" />
-              </span>
+              <HikeOrganizerLauncher />
             </div>
             <div className="mt-4 flex flex-wrap gap-2 border-t border-[#edf0ec] pt-3 dark:border-white/10">
               <span className="inline-flex items-center gap-2 rounded-lg bg-[#f5f7f4] px-3 py-2 text-xs text-[#75847b] dark:bg-white/[0.06] dark:text-white/70">

@@ -20,12 +20,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { changeThemeWithReveal } from '@/lib/theme-transition';
 
 type AccountMenuVariant = 'sidebar' | 'collapsed' | 'mobile' | 'header' | 'rail';
-
-type DocumentWithViewTransition = Document & {
-  startViewTransition?: (updateCallback: () => void) => { finished: Promise<void> };
-};
 
 export function HomeFeedAccountMenu({
   displayName,
@@ -58,45 +55,11 @@ export function HomeFeedAccountMenu({
           : 'flex w-full min-w-0 items-center gap-3 rounded-[8px] px-2 py-2 text-left text-[#64756c] transition-colors hover:bg-[#edf2ed] hover:text-[#17342e] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8bd78] dark:text-white dark:hover:bg-white/[0.08] dark:hover:text-white';
 
   const changeTheme = (element: HTMLElement, nextIsDark: boolean) => {
-    const root = document.documentElement;
     const nextTheme = nextIsDark ? 'dark' : 'light';
-    const bounds = element.getBoundingClientRect();
-    const x = bounds.left + bounds.width / 2;
-    const y = bounds.top + bounds.height / 2;
-    const radius = Math.hypot(
-      Math.max(x, window.innerWidth - x),
-      Math.max(y, window.innerHeight - y),
-    );
-
-    root.style.setProperty('--theme-toggle-x', `${x}px`);
-    root.style.setProperty('--theme-toggle-y', `${y}px`);
-    root.style.setProperty('--theme-toggle-radius', `${radius}px`);
-
-    const updateTheme = () => {
+    changeThemeWithReveal(element, nextTheme, () => {
       setIsDark(nextIsDark);
       setTheme(nextTheme);
-      root.classList.toggle('dark', nextIsDark);
-      root.classList.toggle('light', !nextIsDark);
-      root.style.colorScheme = nextTheme;
-    };
-    const clearOrigin = () => {
-      root.style.removeProperty('--theme-toggle-x');
-      root.style.removeProperty('--theme-toggle-y');
-      root.style.removeProperty('--theme-toggle-radius');
-    };
-    const transitionDocument = document as DocumentWithViewTransition;
-
-    if (
-      !transitionDocument.startViewTransition ||
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
-      updateTheme();
-      clearOrigin();
-      return;
-    }
-
-    const transition = transitionDocument.startViewTransition(updateTheme);
-    void transition.finished.then(clearOrigin, clearOrigin);
+    });
   };
 
   const themeSwitch = (
@@ -128,7 +91,10 @@ export function HomeFeedAccountMenu({
             </span>
             {variant === 'sidebar' && (
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-semibold text-[#263d33] dark:text-white">
+                <span
+                  className="block truncate text-sm font-semibold"
+                  style={{ color: 'var(--dapyo-color-foreground)' }}
+                >
                   {displayName}
                 </span>
                 <span className="mt-0.5 block text-[10px] text-[#89968e] dark:text-white/55">
@@ -159,7 +125,10 @@ export function HomeFeedAccountMenu({
                 {initials}
               </span>
               <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-[#263d33] dark:text-white">
+                <p
+                  className="truncate text-sm font-semibold"
+                  style={{ color: 'var(--dapyo-color-foreground)' }}
+                >
                   {displayName}
                 </p>
                 <p className="text-xs text-[#89968e] dark:text-white/55">DAPYO hiker</p>

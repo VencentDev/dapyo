@@ -1,9 +1,13 @@
 import type { paths } from '@app/api-types';
 
-const API_BASE =
+export const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE ??
   process.env.NEXT_PUBLIC_API_BASE_URL ??
   'http://localhost:8080';
+
+export function apiUrl(path: string) {
+  return /^https?:\/\//i.test(path) ? path : `${API_BASE}${path}`;
+}
 
 export class ApiError extends Error {
   constructor(
@@ -20,13 +24,16 @@ async function apiFetch<T>(
   path: string,
   init: RequestInit = {},
 ): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
+  const headers = new Headers(init.headers);
+  const isFormData = typeof FormData !== 'undefined' && init.body instanceof FormData;
+  if (init.body && !isFormData && !headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json');
+  }
+  if (token) headers.set('Authorization', `Bearer ${token}`);
+
+  const res = await fetch(apiUrl(path), {
     ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(init.headers ?? {}),
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
+    headers,
     cache: 'no-store',
   });
 

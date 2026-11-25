@@ -6,6 +6,7 @@ import com.vencentdev.backend.modules.auth.ratelimit.AuthRateLimitProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -46,6 +47,12 @@ public class SecurityConfig {
                         "/swagger-ui/**",
                         "/api/v1/auth/login",
                         "/api/v1/auth/register")
+                    .permitAll()
+                    .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/v1/hikes",
+                        "/api/v1/hikes/*",
+                        "/api/v1/hikes/*/images/*")
                     .permitAll()
                     .anyRequest()
                     .authenticated())

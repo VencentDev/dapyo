@@ -1,71 +1,76 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@import '@heroui/styles';
+@config '../../tailwind.config.ts';
 
 @layer base {
   :root {
-    --background: 0.97 0.012 150;
-    --foreground: 0.23 0.04 165;
-    --card: 0.99 0.004 150;
-    --card-foreground: 0.23 0.04 165;
-    --popover: 1 0 0;
-    --popover-foreground: 0.18 0.012 285;
-    --primary: 0.68 0.13 75;
-    --primary-foreground: 0.23 0.04 165;
-    --secondary: 0.92 0.025 150;
-    --secondary-foreground: 0.23 0.04 165;
-    --muted: 0.92 0.025 150;
-    --muted-foreground: 0.48 0.035 165;
-    --accent: 0.38 0.09 165;
-    --accent-alt: 0.68 0.13 75;
-    --accent-foreground: 0.985 0.006 150;
-    --destructive: 0.6 0.22 25;
-    --destructive-foreground: 0.985 0.006 285;
-    --border: 0.86 0.025 150;
-    --input: 0.86 0.025 150;
-    --ring: 0.38 0.09 165;
-    --radius: 0.5rem;
-    --color-background: oklch(var(--background));
-    --color-foreground: oklch(var(--foreground));
-    --color-card: oklch(var(--card));
-    --color-border: oklch(var(--border));
-    --color-accent: oklch(var(--accent));
-    --color-accent-alt: oklch(var(--accent-alt));
-    --field-background: color-mix(in oklab, black 3%, transparent);
-    --field-background-focus: color-mix(in oklab, black 5%, transparent);
-    --field-placeholder: oklch(0.55 0.012 285);
+    --dapyo-background: 0.97 0.012 150;
+    --dapyo-foreground: 0.23 0.04 165;
+    --dapyo-card: 0.99 0.004 150;
+    --dapyo-card-foreground: 0.23 0.04 165;
+    --dapyo-popover: 1 0 0;
+    --dapyo-popover-foreground: 0.18 0.012 285;
+    --dapyo-primary: 0.68 0.13 75;
+    --dapyo-primary-foreground: 0.23 0.04 165;
+    --dapyo-secondary: 0.92 0.025 150;
+    --dapyo-secondary-foreground: 0.23 0.04 165;
+    --dapyo-muted: 0.92 0.025 150;
+    --dapyo-muted-foreground: 0.48 0.035 165;
+    --dapyo-accent: 0.38 0.09 165;
+    --dapyo-accent-alt: 0.68 0.13 75;
+    --dapyo-accent-foreground: 0.985 0.006 150;
+    --dapyo-destructive: 0.6 0.22 25;
+    --dapyo-destructive-foreground: 0.985 0.006 285;
+    --dapyo-border: 0.86 0.025 150;
+    --dapyo-input: 0.86 0.025 150;
+    --dapyo-ring: 0.38 0.09 165;
+    --dapyo-radius: 0.5rem;
+    --dapyo-color-background: oklch(var(--dapyo-background));
+    --dapyo-color-foreground: oklch(var(--dapyo-foreground));
+    --dapyo-color-card: oklch(var(--dapyo-card));
+    --dapyo-color-border: oklch(var(--dapyo-border));
+    --dapyo-color-accent: oklch(var(--dapyo-accent));
+    --dapyo-color-accent-alt: oklch(var(--dapyo-accent-alt));
+    --dapyo-field-background: color-mix(in oklab, black 3%, transparent);
+    --dapyo-field-background-focus: color-mix(in oklab, black 5%, transparent);
+    --dapyo-field-placeholder: oklch(0.55 0.012 285);
+    --dapyo-card-shadow: 0 10px 24px -14px rgb(24 53 43 / 26%), 0 3px 9px rgb(24 53 43 / 8%);
+    --dapyo-card-shadow-hover:
+      0 16px 32px -14px rgb(24 53 43 / 30%), 0 5px 12px rgb(24 53 43 / 10%);
   }
 
   .dark {
-    --background: 0.16 0.03 165;
-    --foreground: 0.94 0.025 150;
-    --card: 0.2 0.035 165;
-    --card-foreground: 0.94 0.025 150;
-    --popover: 0.2 0.035 165;
-    --popover-foreground: 0.94 0.025 150;
-    --primary: 0.72 0.13 75;
-    --primary-foreground: 0.18 0.03 165;
-    --secondary: 0.25 0.04 165;
-    --secondary-foreground: 0.94 0.025 150;
-    --muted: 0.25 0.04 165;
-    --muted-foreground: 0.7 0.035 150;
-    --accent: 0.55 0.12 165;
-    --accent-alt: 0.72 0.13 75;
-    --accent-foreground: 0.94 0.025 150;
-    --destructive: 0.6 0.22 25;
-    --destructive-foreground: 0.985 0 0;
-    --border: 0.35 0.04 165;
-    --input: 0.35 0.04 165;
-    --ring: 0.72 0.13 75;
-    --color-background: oklch(var(--background));
-    --color-foreground: oklch(var(--foreground));
-    --color-card: oklch(var(--card));
-    --color-border: oklch(var(--border));
-    --color-accent: oklch(var(--accent));
-    --color-accent-alt: oklch(var(--accent-alt));
-    --field-background: color-mix(in oklab, white 8%, transparent);
-    --field-background-focus: color-mix(in oklab, white 12%, transparent);
-    --field-placeholder: oklch(0.72 0.02 150);
+    --dapyo-background: 0.16 0.03 165;
+    --dapyo-foreground: 0.94 0.025 150;
+    --dapyo-card: 0.2 0.035 165;
+    --dapyo-card-foreground: 0.94 0.025 150;
+    --dapyo-popover: 0.2 0.035 165;
+    --dapyo-popover-foreground: 0.94 0.025 150;
+    --dapyo-primary: 0.72 0.13 75;
+    --dapyo-primary-foreground: 0.18 0.03 165;
+    --dapyo-secondary: 0.25 0.04 165;
+    --dapyo-secondary-foreground: 0.94 0.025 150;
+    --dapyo-muted: 0.25 0.04 165;
+    --dapyo-muted-foreground: 0.7 0.035 150;
+    --dapyo-accent: 0.55 0.12 165;
+    --dapyo-accent-alt: 0.72 0.13 75;
+    --dapyo-accent-foreground: 0.94 0.025 150;
+    --dapyo-destructive: 0.6 0.22 25;
+    --dapyo-destructive-foreground: 0.985 0 0;
+    --dapyo-border: 0.35 0.04 165;
+    --dapyo-input: 0.35 0.04 165;
+    --dapyo-ring: 0.72 0.13 75;
+    --dapyo-color-background: oklch(var(--dapyo-background));
+    --dapyo-color-foreground: oklch(var(--dapyo-foreground));
+    --dapyo-color-card: oklch(var(--dapyo-card));
+    --dapyo-color-border: oklch(var(--dapyo-border));
+    --dapyo-color-accent: oklch(var(--dapyo-accent));
+    --dapyo-color-accent-alt: oklch(var(--dapyo-accent-alt));
+    --dapyo-field-background: color-mix(in oklab, white 8%, transparent);
+    --dapyo-field-background-focus: color-mix(in oklab, white 12%, transparent);
+    --dapyo-field-placeholder: oklch(0.72 0.02 150);
+    --dapyo-card-shadow: 0 14px 30px -15px rgb(0 0 0 / 58%), 0 3px 10px rgb(0 0 0 / 30%);
+    --dapyo-card-shadow-hover: 0 18px 36px -15px rgb(0 0 0 / 64%), 0 5px 14px rgb(0 0 0 / 36%);
   }
 
   * {
@@ -369,7 +374,7 @@
     border-radius: 50%;
     background: rgb(16 35 31 / 28%);
     color: white;
-    font-family: var(--font-ibm-plex-mono), monospace;
+    font-family: var(--font-geist-mono), monospace;
     font-size: 0.65rem;
     backdrop-filter: blur(8px);
   }
@@ -386,7 +391,7 @@
   .how-it-works-step-index {
     display: block;
     color: #d8a75f;
-    font-family: var(--font-ibm-plex-mono), monospace;
+    font-family: var(--font-geist-mono), monospace;
     font-size: 0.62rem;
     font-weight: 600;
     letter-spacing: 0.15em;
@@ -423,7 +428,7 @@
     gap: 0.4rem;
     margin-top: 0.85rem;
     color: rgb(255 255 255 / 70%);
-    font-family: var(--font-ibm-plex-mono), monospace;
+    font-family: var(--font-geist-mono), monospace;
     font-size: 0.58rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -554,27 +559,77 @@
   }
 }
 
+@layer utilities {
+  .dapyo-card-elevation {
+    box-shadow:
+      var(--tw-inset-shadow, 0 0 #0000), var(--tw-inset-ring-shadow, 0 0 #0000),
+      var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000),
+      var(--dapyo-card-shadow);
+    transition: box-shadow 180ms ease;
+  }
+
+  @media (hover: hover) {
+    .dapyo-card-elevation:hover {
+      box-shadow:
+        var(--tw-inset-shadow, 0 0 #0000), var(--tw-inset-ring-shadow, 0 0 #0000),
+        var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000),
+        var(--dapyo-card-shadow-hover);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dapyo-card-elevation {
+      transition: none;
+    }
+  }
+}
+
+.onboarding-theme-hover:is(:hover, [data-hovered='true'], [data-focused='true']):not(
+    [data-disabled='true']
+  ) {
+  background-color: var(--dapyo-color-accent);
+  color: oklch(var(--dapyo-accent-foreground));
+}
+
+.onboarding-interest-tag[data-selected='true'],
+.onboarding-interest-tag[data-selected='true']:is(
+    :hover,
+    [data-hovered='true'],
+    [data-focused='true']
+  ) {
+  border-color: oklch(var(--dapyo-primary));
+  background-color: oklch(var(--dapyo-primary));
+  color: oklch(var(--dapyo-primary-foreground));
+}
+
+.onboarding-interest-tag:not([data-selected='true']):is(:hover, [data-hovered='true']):not(
+    [data-disabled='true']
+  ) {
+  background-color: var(--dapyo-color-accent);
+  color: oklch(var(--dapyo-accent-foreground));
+}
+
 @layer components {
   .field-input {
     width: 100%;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--dapyo-color-border);
     border-radius: 8px;
-    background-color: var(--field-background);
+    background-color: var(--dapyo-field-background);
     padding: 0.625rem 1rem;
-    color: var(--color-foreground);
+    color: var(--dapyo-color-foreground);
     font-size: 0.875rem;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .field-input::placeholder {
-    color: var(--field-placeholder);
+    color: var(--dapyo-field-placeholder);
   }
 
   .field-input:focus {
     outline: none;
-    border-color: var(--color-accent);
-    box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-accent) 20%, transparent);
-    background-color: var(--field-background-focus);
+    border-color: var(--dapyo-color-accent);
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--dapyo-color-accent) 20%, transparent);
+    background-color: var(--dapyo-field-background-focus);
   }
 }
 
@@ -697,7 +752,7 @@
 
   .upcoming-hike-date {
     color: #6d7d74;
-    font-family: var(--font-ibm-plex-mono), monospace;
+    font-family: var(--font-geist-mono), monospace;
     font-size: 0.49rem;
     font-weight: 500;
     letter-spacing: 0.02em;
@@ -710,7 +765,7 @@
     background: #edf2ed;
     padding: 0.22rem 0.38rem;
     color: #446351;
-    font-family: var(--font-ibm-plex-mono), monospace;
+    font-family: var(--font-geist-mono), monospace;
     font-size: 0.43rem;
     letter-spacing: 0.015em;
     line-height: 1;

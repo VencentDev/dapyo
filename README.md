@@ -43,13 +43,13 @@ businesses are future users, not part of the initial product scope.
 
 ### What makes it different
 
-| Product | Primary strength |
-| --- | --- |
-| Facebook Groups | Broad community |
-| Strava | Activity tracking |
-| AllTrails | Trail discovery |
-| Komoot | Route planning |
-| **DAPYO** | **Scheduled hiking and social participation** |
+| Product         | Primary strength                              |
+| --------------- | --------------------------------------------- |
+| Facebook Groups | Broad community                               |
+| Strava          | Activity tracking                             |
+| AllTrails       | Trail discovery                               |
+| Komoot          | Route planning                                |
+| **DAPYO**       | **Scheduled hiking and social participation** |
 
 The product owns the space between “I want to hike” and “I completed a hike”:
 discovery, scheduling, joining, group coordination, and trusted participation.
@@ -67,14 +67,22 @@ The first release should validate one question:
 - Email and Google / Apple authentication.
 - Hiker profiles with location, experience level, and preferred difficulty.
 - A structured mountain and trail database.
-- Create, publish, and manage hiking events.
+- Create and manage hikes with a location, trail name, schedule, caption, square
+  photos, optional route distance, difficulty, group capacity, and join policy.
 - Discover upcoming hikes with date, location, distance, difficulty, and slot
   filters.
+- Mutual Trailmates connections that organizers can add directly to a hike.
 - Join, leave, and view participants for a hike.
 - Basic event discussion and notifications.
 - Manual activity completion with distance, duration, elevation, and photos.
 - User profiles with hiking history, XP, levels, and basic badges.
 - Reporting, blocking, organizer reputation, and admin moderation.
+
+### Future ideas (deferred)
+
+- Award a **Trail Crew** achievement when hikers complete multiple hikes
+  together with the same Trailmates. The threshold and badge design will be
+  decided when achievements are expanded.
 
 Advanced GPS tracking, navigation, live location sharing, SOS, payments,
 subscriptions, and marketplace features are intentionally deferred.
@@ -144,8 +152,12 @@ gamification · social · notifications · reports · admin
 - **Database:** PostgreSQL.
 - **Tooling:** pnpm, Turborepo, Maven, Docker Compose, and GitHub Actions.
 
-The codebase is currently an early product foundation; hiking-specific
-modules are being developed against this architecture.
+The web app now supports public upcoming-hike discovery and details, organizer
+publishing with open or approval-based joining, accepted Trailmate additions,
+outside-account guest counts, and hike-listing photos with captions. New hikes
+use a named meeting location with coordinates; trail catalog search and map
+provider integration remain future work. The **Trail Crew** repeat-hike
+achievement remains deferred as described above.
 
 ## Repository layout
 

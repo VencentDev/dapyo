@@ -5,7 +5,8 @@ import { useEffect, useMemo, useState } from 'react';
 import type { KeyboardEvent } from 'react';
 
 import { Input } from '@/components/ui/input';
-import { popularTrails, sampleActivities } from '@/features/home/feed/lib/home-feed-preview';
+import { popularTrails } from '@/features/hikes/create/lib/mountain-suggestions';
+import { sampleActivities } from '@/features/home/feed/lib/home-feed-preview';
 
 const recentSearchStorageKey = 'dapyo.home.recent-searches';
 const searchDropdownExitDurationMs = 150;
@@ -232,7 +233,7 @@ export function HomeFeedSearch() {
               }}
               onFocus={() => setIsOpen(true)}
               onKeyDown={handleKeyDown}
-              className="h-12 rounded-[8px] border-0 bg-white/70 pl-11 pr-11 text-sm text-[#17342e] shadow-sm shadow-[#17342e]/[0.06] placeholder:text-[#84918a] backdrop-blur-xl focus-visible:ring-0 focus-visible:ring-offset-0"
+              className="dapyo-card-elevation h-10 rounded-full border-0 bg-white/70 pl-11 pr-11 text-sm text-[#17342e] placeholder:text-[#84918a] backdrop-blur-xl focus-visible:ring-0 focus-visible:ring-offset-0"
             />
             {query && (
               <button
@@ -244,7 +245,7 @@ export function HomeFeedSearch() {
                   setActiveOptionIndex(-1);
                   setIsOpen(true);
                 }}
-                className="absolute right-2 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-[8px] text-[#718077] transition-colors hover:bg-[#eef2ed] hover:text-[#17342e] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d8a75f]"
+                className="absolute right-2 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-full text-[#718077] transition-colors hover:bg-[#eef2ed] hover:text-[#17342e] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d8a75f]"
               >
                 <X className="size-4" aria-hidden="true" />
               </button>
