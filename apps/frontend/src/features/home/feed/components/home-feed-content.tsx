@@ -1,11 +1,10 @@
-import { Heart, MapPin, Mountain } from 'lucide-react';
+import { Heart, LocationPin, Mountain } from '@boxicons/react';
 
 import { HikeOrganizerLauncher } from '@/features/hikes/create/components/hike-organizer-launcher';
-import { ActivityFeedPost } from '@/features/home/feed/components/activity-feed-post';
+import { HomeFeedHikes } from '@/features/home/feed/components/home-feed-hikes';
 import { HomeFeedNavigation } from '@/features/home/feed/components/home-feed-navigation';
 import { HomeFeedSearch } from '@/features/home/feed/components/home-feed-search';
 import { HomeFeedSidebar } from '@/features/home/feed/components/home-feed-sidebar';
-import { sampleActivities } from '@/features/home/feed/lib/home-feed-preview';
 
 export function HomeFeedContent({ displayName }: { displayName: string }) {
   const initials =
@@ -43,46 +42,31 @@ export function HomeFeedContent({ displayName }: { displayName: string }) {
               </span>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-[#233a31] dark:text-white">
-                  Share a trail moment
+                  Organize a hike
                 </p>
                 <p className="mt-0.5 text-xs text-[#87948c] dark:text-white/55">
-                  Activity sharing will appear here when it is connected.
+                  Post a plan and find hikers for your trail crew.
                 </p>
               </div>
               <HikeOrganizerLauncher />
             </div>
             <div className="mt-4 flex flex-wrap gap-2 border-t border-[#edf0ec] pt-3 dark:border-white/10">
               <span className="inline-flex items-center gap-2 rounded-lg bg-[#f5f7f4] px-3 py-2 text-xs text-[#75847b] dark:bg-white/[0.06] dark:text-white/70">
-                <Mountain className="size-3.5 text-[#a77845]" aria-hidden="true" />
-                Hike recap
+                <Mountain pack="filled" className="size-3.5 text-[#a77845]" aria-hidden="true" />
+                Trail and difficulty
               </span>
               <span className="inline-flex items-center gap-2 rounded-lg bg-[#f5f7f4] px-3 py-2 text-xs text-[#75847b] dark:bg-white/[0.06] dark:text-white/70">
-                <MapPin className="size-3.5 text-[#a77845]" aria-hidden="true" />
-                Trail note
+                <LocationPin pack="filled" className="size-3.5 text-[#a77845]" aria-hidden="true" />
+                Meeting place and schedule
               </span>
               <span className="ml-auto hidden items-center gap-1.5 text-[10px] text-[#9aa59e] dark:text-white/45 sm:inline-flex">
-                <Heart className="size-3" aria-hidden="true" /> You choose what to share
+                <Heart pack="filled" className="size-3" aria-hidden="true" /> Your hike appears in
+                the community feed
               </span>
             </div>
           </section>
 
-          <div className="mb-3 flex items-center justify-between px-1">
-            <h2 className="text-base font-semibold tracking-tight text-[#263d33] dark:text-[#edf4ef]">
-              From the trail
-            </h2>
-            <span className="text-[10px] text-[#89968e] dark:text-white/50">
-              Sample community updates
-            </span>
-          </div>
-          <div className="space-y-4">
-            {sampleActivities.map((post) => (
-              <ActivityFeedPost key={post.author} post={post} />
-            ))}
-          </div>
-          <p className="mt-4 px-1 text-[10px] leading-5 text-[#98a39c] dark:text-white/40">
-            Feed examples are design previews. Real activity appears only when someone chooses to
-            share it.
-          </p>
+          <HomeFeedHikes />
         </section>
 
         <div className="lg:col-start-2 xl:col-auto">
