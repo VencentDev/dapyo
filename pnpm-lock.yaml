@@ -60,6 +60,9 @@ importers:
       '@auth/core':
         specifier: ^0.41.0
         version: 0.41.0
+      '@boxicons/react':
+        specifier: ^1.0.3
+        version: 1.0.3(react@19.3.1)
       '@gravity-ui/icons':
         specifier: ^2.23.1
         version: 2.23.1(react@19.3.1)
@@ -251,6 +254,14 @@ packages:
         integrity: sha512-304gsbbGVmQc+cNGHzwHBlqepYdWLKj3VXCQBGt/EGcV7PUPfKI7kAUNW1FZEOCwlQiLvQjg1JEaAlRQ616h+Q==,
       }
     engines: { node: '>=6.9.0' }
+
+  '@boxicons/react@1.0.3':
+    resolution:
+      {
+        integrity: sha512-NASJNbk4X6Xi24CIa/Anx7KhMH1KPiBuaq0RJq3HJiFg65Ct9mhIB6j/a/Ciz/ZOTGaGzisWYmbU4jdKKK/YYA==,
+      }
+    peerDependencies:
+      react: '>=16.8.0'
 
   '@commitlint/cli@19.8.1':
     resolution:
@@ -5357,6 +5368,8 @@ snapshots:
   '@babel/helper-validator-identifier@7.29.7': {}
 
   '@babel/runtime@7.29.15': {}
+
+  '@boxicons/react@1.0.3(react@19.3.1)': {}
 
   '@commitlint/cli@19.8.1(@types/node@25.9.1)(typescript@5.9.3)':
     dependencies:

@@ -1272,7 +1272,7 @@
           "mountainName",
           "latitude",
           "longitude",
-          "scheduledStartAt",
+          "scheduledDate",
           "difficulty",
           "maxParticipants",
           "initialMemberIds",
@@ -1306,12 +1306,18 @@
             "minimum": -180,
             "maximum": 180
           },
-          "scheduledStartAt": {
+          "scheduledDate": {
             "type": "string",
-            "format": "date-time"
+            "format": "date"
           },
           "difficulty": {
             "$ref": "#/components/schemas/TrailDifficulty"
+          },
+          "difficultyRating": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1,
+            "maximum": 5
           },
           "maxParticipants": {
             "type": "integer",
@@ -1329,6 +1335,14 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          },
+          "externalGuestNames": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            }
           },
           "admissionMode": {
             "$ref": "#/components/schemas/HikeAdmissionMode"
@@ -1458,8 +1472,9 @@
           "distanceKm",
           "latitude",
           "longitude",
-          "scheduledStartAt",
+          "scheduledDate",
           "difficulty",
+          "difficultyRating",
           "maxParticipants",
           "joinedMemberCount",
           "externalGuestCount",
@@ -1487,12 +1502,18 @@
           "longitude": {
             "type": "number"
           },
-          "scheduledStartAt": {
+          "scheduledDate": {
             "type": "string",
-            "format": "date-time"
+            "format": "date"
           },
           "difficulty": {
             "$ref": "#/components/schemas/TrailDifficulty"
+          },
+          "difficultyRating": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1,
+            "maximum": 5
           },
           "maxParticipants": {
             "type": "integer",
@@ -1527,11 +1548,13 @@
           "distanceKm",
           "latitude",
           "longitude",
-          "scheduledStartAt",
+          "scheduledDate",
           "difficulty",
+          "difficultyRating",
           "maxParticipants",
           "joinedMemberCount",
           "externalGuestCount",
+          "externalGuestNames",
           "availablePlaces",
           "admissionMode",
           "description",
@@ -1559,12 +1582,18 @@
           "longitude": {
             "type": "number"
           },
-          "scheduledStartAt": {
+          "scheduledDate": {
             "type": "string",
-            "format": "date-time"
+            "format": "date"
           },
           "difficulty": {
             "$ref": "#/components/schemas/TrailDifficulty"
+          },
+          "difficultyRating": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1,
+            "maximum": 5
           },
           "maxParticipants": {
             "type": "integer",
@@ -1577,6 +1606,12 @@
           "externalGuestCount": {
             "type": "integer",
             "format": "int32"
+          },
+          "externalGuestNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "availablePlaces": {
             "type": "integer",

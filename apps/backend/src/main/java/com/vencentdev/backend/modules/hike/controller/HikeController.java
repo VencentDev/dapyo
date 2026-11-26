@@ -53,7 +53,7 @@ public class HikeController {
 
   @GetMapping
   public PageResponse<HikeSummaryResponse> getUpcomingHikes(
-      @PageableDefault(size = 20, sort = "scheduledStartAt", direction = Sort.Direction.ASC)
+      @PageableDefault(size = 20, sort = "scheduledDate", direction = Sort.Direction.ASC)
           Pageable pageable) {
     int pageSize = Math.min(pageable.getPageSize(), MAX_PAGE_SIZE);
     Pageable boundedPageable = PageRequest.of(pageable.getPageNumber(), pageSize);

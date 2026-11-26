@@ -30,6 +30,8 @@ import com.vencentdev.backend.modules.user.repository.UserRepository;
 import com.vencentdev.backend.modules.user.service.UserService;
 import java.math.RoundingMode;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -43,6 +45,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class HikeServiceImpl implements HikeService {
+
+  private static final ZoneId HIKES_ZONE = ZoneId.of("Asia/Manila");
 
   private final HikeRepository hikes;
   private final HikeParticipantRepository participants;
@@ -69,6 +73,10 @@ public class HikeServiceImpl implements HikeService {
   @Override
   @Transactional
   public HikeDetailResponse createHike(AuthenticatedUser principal, HikeCreateRequest request) {
+    if (!request.scheduledDate().isAfter(LocalDate.now(HIKES_ZONE))) {
+      throw new BadRequestException("Hike date must be in the future");
+    }
+
     UUID organizerId = users.resolveInternalId(principal);
     List<UUID> memberIds = request.initialMemberIds();
     LinkedHashSet<UUID> uniqueMemberIds = new LinkedHashSet<>(memberIds);
@@ -91,6 +99,13 @@ public class HikeServiceImpl implements HikeService {
     if (1L + uniqueMemberIds.size() + request.externalGuestCount() > request.maxParticipants()) {
       throw new BadRequestException("The selected group is larger than the hike capacity");
     }
+    List<String> guestNames =
+        request.externalGuestNames() == null
+            ? List.of()
+            : request.externalGuestNames().stream().map(String::trim).toList();
+    if (guestNames.size() > request.externalGuestCount()) {
+      throw new BadRequestException("Guest names cannot exceed the guest count");
+    }
 
     Hike hike =
         hikes.save(
@@ -104,10 +119,12 @@ public class HikeServiceImpl implements HikeService {
                         : request.distanceKm().setScale(2, RoundingMode.HALF_UP))
                 .latitude(request.latitude().setScale(6, RoundingMode.HALF_UP))
                 .longitude(request.longitude().setScale(6, RoundingMode.HALF_UP))
-                .scheduledStartAt(request.scheduledStartAt())
+                .scheduledDate(request.scheduledDate())
                 .difficulty(request.difficulty())
+                .difficultyRating(difficultyRating(request))
                 .maxParticipants(request.maxParticipants())
                 .externalGuestCount(request.externalGuestCount())
+                .externalGuestNames(guestNames)
                 .admissionMode(request.admissionMode())
                 .description(request.description().trim())
                 .requirements(normalizeOptionalText(request.requirements()))
@@ -135,8 +152,8 @@ public class HikeServiceImpl implements HikeService {
     Pageable boundedPageable =
         PageRequest.of(pageable.getPageNumber(), Math.min(pageable.getPageSize(), 50));
     Page<Hike> page =
-        hikes.findByStatusAndScheduledStartAtAfterOrderByScheduledStartAtAsc(
-            HikeStatus.PUBLISHED, Instant.now(), boundedPageable);
+        hikes.findByStatusAndScheduledDateGreaterThanEqualOrderByScheduledDateAsc(
+            HikeStatus.PUBLISHED, LocalDate.now(HIKES_ZONE), boundedPageable);
     return PageResponse.from(page.map(this::toSummary));
   }
 
@@ -159,7 +176,7 @@ public class HikeServiceImpl implements HikeService {
     if (hike.getOrganizerId().equals(userId)) {
       throw new ConflictException("You are already organizing this hike");
     }
-    if (!hike.getScheduledStartAt().isAfter(Instant.now())) {
+    if (hike.getScheduledDate().isBefore(LocalDate.now(HIKES_ZONE))) {
       throw new ConflictException("This hike has already started");
     }
     ensureAvailablePlace(hike);
@@ -291,6 +308,10 @@ public class HikeServiceImpl implements HikeService {
       throw new ConflictException("The guest count would put the hike over capacity");
     }
     hike.setExternalGuestCount(request.externalGuestCount());
+    if (hike.getExternalGuestNames().size() > request.externalGuestCount()) {
+      hike.setExternalGuestNames(
+          List.copyOf(hike.getExternalGuestNames().subList(0, request.externalGuestCount())));
+    }
     return toDetail(hike, hike.getOrganizerId());
   }
 
@@ -303,8 +324,9 @@ public class HikeServiceImpl implements HikeService {
         hike.getDistanceKm(),
         hike.getLatitude(),
         hike.getLongitude(),
-        hike.getScheduledStartAt(),
+        hike.getScheduledDate(),
         hike.getDifficulty(),
+        hike.getDifficultyRating(),
         hike.getMaxParticipants(),
         joined,
         hike.getExternalGuestCount(),
@@ -347,11 +369,13 @@ public class HikeServiceImpl implements HikeService {
         hike.getDistanceKm(),
         hike.getLatitude(),
         hike.getLongitude(),
-        hike.getScheduledStartAt(),
+        hike.getScheduledDate(),
         hike.getDifficulty(),
+        hike.getDifficultyRating(),
         hike.getMaxParticipants(),
         joinedCount,
         hike.getExternalGuestCount(),
+        hike.getExternalGuestNames(),
         availablePlaces(hike, joinedCount),
         hike.getAdmissionMode(),
         hike.getDescription(),
@@ -424,6 +448,17 @@ public class HikeServiceImpl implements HikeService {
 
   private int availablePlaces(Hike hike, int joinedCount) {
     return hike.getMaxParticipants() - 1 - joinedCount - hike.getExternalGuestCount();
+  }
+
+  private int difficultyRating(HikeCreateRequest request) {
+    if (request.difficultyRating() != null) {
+      return request.difficultyRating();
+    }
+    return switch (request.difficulty()) {
+      case EASY -> 2;
+      case MODERATE -> 3;
+      case CHALLENGING -> 5;
+    };
   }
 
   private void ensureAvailablePlace(Hike hike) {

@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
-import { LocateFixed, Search } from 'lucide-react';
+import { Crosshair, Search } from '@boxicons/react';
 import { Label, Slider } from '@heroui/react';
 
 import {
@@ -323,7 +323,7 @@ export function LocationPickerDialog({
               {isSearching ? (
                 <span className="size-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
               ) : (
-                <Search className="size-4" aria-hidden="true" />
+                <Search pack="filled" className="size-4" aria-hidden="true" />
               )}
             </button>
           </form>
@@ -365,7 +365,7 @@ export function LocationPickerDialog({
               disabled={isLocating || isResolving}
               className="absolute right-3 top-3 z-[500] inline-flex h-9 items-center gap-2 rounded-lg border border-border bg-card/95 px-3 text-xs font-semibold text-card-foreground shadow-md transition-colors hover:bg-card disabled:cursor-wait disabled:opacity-60"
             >
-              <LocateFixed className="size-3.5" aria-hidden="true" />
+              <Crosshair pack="filled" className="size-3.5" aria-hidden="true" />
               {isLocating ? 'Finding you…' : 'Use my current position'}
             </button>
             <div className="absolute bottom-3 left-1/2 z-[500] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 px-3 py-1">

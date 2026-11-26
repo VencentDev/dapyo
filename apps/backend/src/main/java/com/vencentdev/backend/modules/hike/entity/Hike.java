@@ -13,7 +13,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -22,6 +24,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "hikes")
@@ -56,18 +60,26 @@ public class Hike extends AuditableEntity {
   @Column(nullable = false, precision = 9, scale = 6)
   private BigDecimal longitude;
 
-  @Column(name = "scheduled_start_at", nullable = false)
-  private Instant scheduledStartAt;
+  @Column(name = "scheduled_date", nullable = false)
+  private LocalDate scheduledDate;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false, length = 32)
   private TrailDifficulty difficulty;
+
+  @Column(name = "difficulty_rating", nullable = false)
+  private int difficultyRating;
 
   @Column(name = "max_participants", nullable = false)
   private int maxParticipants;
 
   @Column(name = "external_guest_count", nullable = false)
   private int externalGuestCount;
+
+  @JdbcTypeCode(SqlTypes.JSON)
+  @Column(name = "external_guest_names", nullable = false, columnDefinition = "jsonb")
+  @Builder.Default
+  private List<String> externalGuestNames = new ArrayList<>();
 
   @Enumerated(EnumType.STRING)
   @Column(name = "admission_mode", nullable = false, length = 24)

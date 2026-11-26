@@ -96,7 +96,7 @@ export function HikeDiscoveryPageContent() {
                 <div className="mt-4 grid grid-cols-2 gap-3 text-xs text-[#586b60] dark:text-white/65">
                   <span className="flex items-center gap-2">
                     <CalendarDays className="size-3.5 text-[#a77845]" aria-hidden="true" />
-                    {formatDate(hike.scheduledStartAt)}
+                    {formatDate(hike.scheduledDate)}
                   </span>
                   <span className="flex items-center gap-2">
                     <Ruler className="size-3.5 text-[#a77845]" aria-hidden="true" />
@@ -172,8 +172,9 @@ export function HikeDiscoveryPageContent() {
 }
 
 function formatDate(value: string) {
-  return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(
-    new Date(value),
+  const [year, month, day] = value.split('-').map(Number);
+  return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(
+    new Date(year, month - 1, day),
   );
 }
 

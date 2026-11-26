@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
-import { Check, Plus, Search, UserRound, UserRoundPlus, X } from 'lucide-react';
+import { Check, Plus, Search, User, UserPlus, X } from '@boxicons/react';
+import { Button as HeroButton, Tooltip } from '@heroui/react';
 
 import {
   Dialog,
@@ -12,9 +13,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
-import { usePublicProfileSearch } from '@/features/trailmates/api/trailmates.hooks';
+import { usePublicProfileSearch, useTrailmates } from '@/features/trailmates/api/trailmates.hooks';
 import type { PublicProfile } from '@/features/trailmates/api/trailmates.hooks';
 import { TrailmateAvatar } from '@/features/trailmates/components/trailmate-avatar';
 
@@ -23,9 +23,11 @@ import type { HikeJoinedHiker } from '../lib/hike-joined-hiker';
 export function HikeJoinedHikerPicker({
   selectedHikers,
   onChange,
+  portalContainer,
 }: {
   selectedHikers: HikeJoinedHiker[];
   onChange: (hikers: HikeJoinedHiker[]) => void;
+  portalContainer?: HTMLElement | null;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -37,16 +39,21 @@ export function HikeJoinedHikerPicker({
   }, [query]);
 
   const search = usePublicProfileSearch(debouncedQuery);
+  const trailmates = useTrailmates(isOpen);
   const normalizedName = query.trim().toLocaleLowerCase();
   const selectedProfileIds = useMemo(
     () =>
       new Set(selectedHikers.filter((hiker) => hiker.kind === 'profile').map((hiker) => hiker.id)),
     [selectedHikers],
   );
-  const matchingProfiles = (search.data ?? []).filter(
+  const acceptedTrailmateIds = new Set((trailmates.data ?? []).map((hiker) => hiker.userId));
+  const acceptedProfileMatches = (search.data ?? []).filter((profile) =>
+    acceptedTrailmateIds.has(profile.id),
+  );
+  const matchingProfiles = acceptedProfileMatches.filter(
     (profile) => !selectedProfileIds.has(profile.id),
   );
-  const hasSelectedProfileMatch = (search.data ?? []).some((profile) =>
+  const hasSelectedProfileMatch = acceptedProfileMatches.some((profile) =>
     selectedProfileIds.has(profile.id),
   );
   const isSearching =
@@ -88,20 +95,33 @@ export function HikeJoinedHikerPicker({
         }
       }}
     >
-      <DialogTrigger asChild>
-        <button
+      <Tooltip delay={0}>
+        <HeroButton
           type="button"
+          variant="tertiary"
+          aria-haspopup="dialog"
           aria-expanded={isOpen}
           aria-label={`Tag joined hikers. ${selectedHikers.length} selected.`}
-          className="inline-flex h-7 shrink-0 items-center gap-1.5 rounded-md px-1.5 text-[11px] font-medium text-[#536b5d] transition-colors hover:bg-[#edf5ee] hover:text-[#1d604c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d604c]/25 dark:text-white/65 dark:hover:bg-white/[0.08] dark:hover:text-white"
+          onPress={() => setIsOpen(true)}
+          className="!relative !grid !size-8 !min-w-8 !shrink-0 !place-items-center !rounded-full !border-0 !bg-[#e8ece9] !p-0 !text-[#5b6b60] transition-colors hover:!bg-[#1d604c] hover:!text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d604c]/25 dark:!bg-white/10 dark:!text-white/70 dark:hover:!bg-[#1d604c] dark:hover:!text-white dark:focus-visible:ring-[#e8bd78]/40"
         >
-          <UserRound className="size-3.5 text-[#9a7548] dark:text-[#e8bd78]" aria-hidden="true" />
-          <span>Tag joined hikers</span>
-          <span className="grid min-w-4 place-items-center rounded-full bg-[#edf5ee] px-1 text-[9px] font-semibold text-[#31533f] dark:bg-white/10 dark:text-[#cde5d3]">
+          <User pack="filled" className="size-4" aria-hidden="true" />
+          <span className="sr-only">Tag joined hikers</span>
+          <span className="absolute -right-1 -top-1 grid min-w-4 place-items-center rounded-full bg-[#edf5ee] px-1 text-[9px] font-semibold leading-4 text-[#31533f] dark:bg-[#1d3a30] dark:text-[#cde5d3]">
             {selectedHikers.length}
           </span>
-        </button>
-      </DialogTrigger>
+        </HeroButton>
+        <Tooltip.Content
+          className="z-[100] whitespace-nowrap"
+          UNSTABLE_portalContainer={portalContainer ?? undefined}
+          showArrow
+          placement="top"
+          offset={8}
+        >
+          <Tooltip.Arrow />
+          <p>Tell others who’s already joined · {selectedHikers.length} selected</p>
+        </Tooltip.Content>
+      </Tooltip>
 
       <DialogContent
         showCloseButton
@@ -113,7 +133,7 @@ export function HikeJoinedHikerPicker({
             Tag joined hikers
           </DialogTitle>
           <DialogDescription className="mt-1 text-sm leading-5 text-[#718176] dark:text-white/55">
-            Search DAPYO profiles or add someone by name. Tagged hikers count toward your capacity.
+            Search accepted Trailmates or add a guest name to tag them in your hike post.
           </DialogDescription>
         </DialogHeader>
 
@@ -123,6 +143,7 @@ export function HikeJoinedHikerPicker({
           </label>
           <div className="flex items-center gap-2 rounded-[8px] border border-[#d8e2d9] bg-white px-3 focus-within:border-[#1d604c] focus-within:ring-2 focus-within:ring-[#1d604c]/15 dark:border-white/15 dark:bg-white/[0.04] dark:focus-within:border-[#81ad90]">
             <Search
+              pack="filled"
               className="size-4 shrink-0 text-[#718176] dark:text-white/45"
               aria-hidden="true"
             />
@@ -131,6 +152,7 @@ export function HikeJoinedHikerPicker({
               type="search"
               autoComplete="off"
               autoFocus
+              maxLength={120}
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               onKeyDown={(event) => {
@@ -140,7 +162,7 @@ export function HikeJoinedHikerPicker({
                 }
               }}
               placeholder="Search a profile or enter a name"
-              className="h-11 min-w-0 flex-1 bg-transparent text-sm text-[#203a2e] outline-none placeholder:text-[#89978e] dark:text-white dark:placeholder:text-white/40"
+              className="h-11 min-w-0 flex-1 bg-transparent text-sm !text-black outline-none placeholder:text-[#89978e] dark:!text-white dark:placeholder:text-white/40"
             />
             <button
               type="button"
@@ -152,7 +174,7 @@ export function HikeJoinedHikerPicker({
               onClick={addGuest}
               className="grid size-8 shrink-0 place-items-center rounded-full text-[#1d604c] transition-colors hover:bg-[#eaf3eb] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d604c]/30 disabled:cursor-not-allowed disabled:opacity-35 dark:text-[#b9d8c2] dark:hover:bg-white/[0.1]"
             >
-              <UserRoundPlus className="size-[18px]" aria-hidden="true" />
+              <UserPlus pack="filled" className="size-[18px]" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -160,12 +182,15 @@ export function HikeJoinedHikerPicker({
         <div className="min-h-0 flex-1 overflow-y-auto px-5 py-3 sm:px-6" aria-live="polite">
           {query.trim().length < 2 ? (
             <p className="rounded-[8px] bg-[#f4f7f3] px-4 py-3 text-sm leading-5 text-[#68796e] dark:bg-white/[0.05] dark:text-white/60">
-              Type at least 2 characters to search profiles, or use the person-plus button to add a
-              guest.
+              Tag hikers who have already joined to let others know who’s coming.
             </p>
           ) : isSearching ? (
             <p className="px-1 py-3 text-sm text-[#68796e] dark:text-white/60">
               Searching profiles…
+            </p>
+          ) : trailmates.isLoading ? (
+            <p className="px-1 py-3 text-sm text-[#68796e] dark:text-white/60">
+              Loading your Trailmates…
             </p>
           ) : search.isError ? (
             <p
@@ -205,7 +230,7 @@ export function HikeJoinedHikerPicker({
                     onClick={() => addProfile(profile)}
                     className="grid size-9 shrink-0 place-items-center rounded-full bg-[#eaf3eb] text-[#1d604c] transition-colors hover:bg-[#d9eadb] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d604c]/30 dark:bg-white/[0.08] dark:text-[#b9d8c2] dark:hover:bg-white/[0.14]"
                   >
-                    <Plus className="size-4" aria-hidden="true" />
+                    <Plus pack="filled" className="size-4" aria-hidden="true" />
                   </button>
                 </li>
               ))}
@@ -213,6 +238,11 @@ export function HikeJoinedHikerPicker({
           ) : hasSelectedProfileMatch ? (
             <p className="rounded-[8px] bg-[#f4f7f3] px-4 py-3 text-sm text-[#68796e] dark:bg-white/[0.05] dark:text-white/60">
               Matching profiles are already tagged.
+            </p>
+          ) : (search.data ?? []).length > 0 ? (
+            <p className="rounded-[8px] bg-[#f4f7f3] px-4 py-3 text-sm leading-5 text-[#68796e] dark:bg-white/[0.05] dark:text-white/60">
+              Only accepted Trailmates can be tagged as profiles. Add a guest by name if they have
+              already joined.
             </p>
           ) : null}
         </div>
@@ -241,7 +271,7 @@ export function HikeJoinedHikerPicker({
               {selectedHikers.map((hiker) => (
                 <li
                   key={hiker.id}
-                  className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-[#dce8dd] bg-[#f1f6f1] py-1 pl-3 pr-1 text-xs font-medium text-[#355343] dark:border-white/10 dark:bg-white/[0.06] dark:text-white/80"
+                  className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-[#1d604c] bg-[#1d604c] py-1 pl-3 pr-1 text-xs font-medium text-white dark:border-[#e8bd78] dark:bg-[#e8bd78] dark:text-[#17342e]"
                 >
                   <span className="max-w-48 truncate">{hiker.name}</span>
                   {hiker.kind === 'profile' && <span className="sr-only">DAPYO profile</span>}
@@ -252,9 +282,9 @@ export function HikeJoinedHikerPicker({
                     onClick={() =>
                       onChange(selectedHikers.filter((selected) => selected.id !== hiker.id))
                     }
-                    className="grid size-6 shrink-0 place-items-center rounded-full text-[#718176] transition-colors hover:bg-white hover:text-[#a43f2d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d604c]/30 dark:text-white/55 dark:hover:bg-white/10 dark:hover:text-[#ffb7a8]"
+                    className="grid size-6 shrink-0 place-items-center rounded-full text-white/75 transition-colors hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 dark:text-[#17342e]/70 dark:hover:bg-black/10 dark:hover:text-[#17342e] dark:focus-visible:ring-[#17342e]/40"
                   >
-                    <X className="size-3.5" aria-hidden="true" />
+                    <X pack="filled" className="size-3.5" aria-hidden="true" />
                   </button>
                 </li>
               ))}
@@ -272,7 +302,7 @@ export function HikeJoinedHikerPicker({
               type="button"
               className="inline-flex h-9 items-center gap-2 rounded-[8px] bg-[#1d604c] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#174c3d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d9aa58]"
             >
-              <Check className="size-4" aria-hidden="true" />
+              <Check pack="filled" className="size-4" aria-hidden="true" />
               Done
             </button>
           </DialogClose>
