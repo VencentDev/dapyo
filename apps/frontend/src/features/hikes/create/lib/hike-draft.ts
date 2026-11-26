@@ -14,7 +14,6 @@ export type HikeDraft = {
   latitude: string;
   longitude: string;
   date: string;
-  time: string;
   difficulty: 'EASY' | 'MODERATE' | 'CHALLENGING';
   maxParticipants: string;
   selectedMemberIds: string[];
@@ -35,7 +34,6 @@ export function createInitialHikeDraft(): HikeDraft {
     latitude: '',
     longitude: '',
     date: '',
-    time: '',
     difficulty: 'MODERATE',
     maxParticipants: '10',
     selectedMemberIds: [],
@@ -47,10 +45,27 @@ export function createInitialHikeDraft(): HikeDraft {
   };
 }
 
-export function parseLocalStart(date: string, time: string) {
-  if (!date || !time) return null;
-  const parsed = new Date(`${date}T${time}`);
-  return Number.isNaN(parsed.getTime()) ? null : parsed;
+export function parseLocalDate(date: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+  const [year, month, day] = date.split('-').map(Number);
+  const parsed = new Date(year, month - 1, day);
+  if (
+    parsed.getFullYear() !== year ||
+    parsed.getMonth() !== month - 1 ||
+    parsed.getDate() !== day
+  ) {
+    return null;
+  }
+  return parsed;
+}
+
+export function isFutureLocalDate(date: string) {
+  const parsed = parseLocalDate(date);
+  if (!parsed) return false;
+  parsed.setHours(0, 0, 0, 0);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return parsed.getTime() > today.getTime();
 }
 
 export function validateHikeDraft(draft: HikeDraft): HikeDraftErrors {
@@ -72,9 +87,7 @@ export function validateHikeDraft(draft: HikeDraft): HikeDraftErrors {
     errors.longitude = 'Enter a longitude between -180 and 180.';
   }
 
-  const start = parseLocalStart(draft.date, draft.time);
-  if (!start) errors.date = 'Choose a date and start time.';
-  else if (start.getTime() <= Date.now()) errors.date = 'Choose a future date and time.';
+  if (!isFutureLocalDate(draft.date)) errors.date = 'Choose a future date.';
 
   const capacity = Number(draft.maxParticipants);
   const guests = Number(draft.externalGuestCount);
@@ -107,8 +120,8 @@ export function validateHikeDraft(draft: HikeDraft): HikeDraftErrors {
 }
 
 export function hikeDraftToRequest(draft: HikeDraft): HikeCreateRequest {
-  const start = parseLocalStart(draft.date, draft.time);
-  if (!start) throw new Error('Choose a valid date and time before publishing.');
+  if (!isFutureLocalDate(draft.date))
+    throw new Error('Choose a valid future date before publishing.');
 
   return {
     locationName: draft.locationName.trim(),
@@ -116,7 +129,7 @@ export function hikeDraftToRequest(draft: HikeDraft): HikeCreateRequest {
     distanceKm: draft.distanceKm.trim() ? Number(draft.distanceKm) : null,
     latitude: Number(draft.latitude),
     longitude: Number(draft.longitude),
-    scheduledStartAt: start.toISOString(),
+    scheduledDate: draft.date,
     difficulty: draft.difficulty,
     maxParticipants: Number(draft.maxParticipants),
     initialMemberIds: Array.from(new Set(draft.selectedMemberIds)),

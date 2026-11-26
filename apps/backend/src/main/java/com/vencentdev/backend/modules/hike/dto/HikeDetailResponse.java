@@ -3,7 +3,7 @@ package com.vencentdev.backend.modules.hike.dto;
 import com.vencentdev.backend.modules.hike.enums.HikeAdmissionMode;
 import com.vencentdev.backend.modules.user.enums.onboarding.TrailDifficulty;
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,11 +14,13 @@ public record HikeDetailResponse(
     BigDecimal distanceKm,
     BigDecimal latitude,
     BigDecimal longitude,
-    Instant scheduledStartAt,
+    LocalDate scheduledDate,
     TrailDifficulty difficulty,
+    int difficultyRating,
     int maxParticipants,
     int joinedMemberCount,
     int externalGuestCount,
+    List<String> externalGuestNames,
     int availablePlaces,
     HikeAdmissionMode admissionMode,
     String description,

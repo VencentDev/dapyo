@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
-import { Crop } from 'lucide-react';
+import { Crop } from '@boxicons/react';
 
 import {
   Dialog,
@@ -285,7 +285,7 @@ export function HikeImageCropDialog({
             onClick={applyImage}
             className="inline-flex h-9 items-center justify-center gap-2 rounded-[8px] bg-[#1d604c] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#174c3d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d9aa58] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <Crop className="size-4" aria-hidden="true" />
+            <Crop pack="filled" className="size-4" aria-hidden="true" />
             {cropMode === 'fit' ? 'Use whole photo' : 'Apply crop'}
           </button>
         </DialogFooter>

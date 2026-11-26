@@ -4,14 +4,11 @@ import { CalendarDays, MapPin, UsersRound, type LucideIcon } from 'lucide-react'
 import type { ReactNode } from 'react';
 
 import type { HikeDraft } from '../lib/hike-draft';
-import { parseLocalStart } from '../lib/hike-draft';
+import { parseLocalDate } from '../lib/hike-draft';
 
 export function HikeReviewStep({ draft }: { draft: HikeDraft }) {
-  const start = parseLocalStart(draft.date, draft.time);
-  const formatter = new Intl.DateTimeFormat(undefined, {
-    dateStyle: 'full',
-    timeStyle: 'short',
-  });
+  const date = parseLocalDate(draft.date);
+  const formatter = new Intl.DateTimeFormat(undefined, { dateStyle: 'full' });
   const capacity = Number(draft.maxParticipants) || 0;
   const selectedCount = draft.selectedMemberIds.length;
   const guestCount = Number(draft.externalGuestCount) || 0;
@@ -34,7 +31,7 @@ export function HikeReviewStep({ draft }: { draft: HikeDraft }) {
           </span>
         </ReviewRow>
         <ReviewRow icon={CalendarDays} label="When">
-          <strong>{start ? formatter.format(start) : 'Date and time not set'}</strong>
+          <strong>{date ? formatter.format(date) : 'Date not set'}</strong>
         </ReviewRow>
         <ReviewRow icon={UsersRound} label="Group">
           <strong>

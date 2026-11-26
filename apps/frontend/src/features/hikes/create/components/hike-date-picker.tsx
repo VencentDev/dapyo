@@ -1,8 +1,8 @@
 'use client';
 
-import { Calendar, DateField, DatePicker, Label, type DateValue } from '@heroui/react';
+import { Calendar, DateField, DatePicker, Label, Tooltip, type DateValue } from '@heroui/react';
 import { getLocalTimeZone, today } from '@internationalized/date';
-import { CalendarDays } from 'lucide-react';
+import { Calendar as CalendarIcon } from '@boxicons/react';
 
 export function HikeDatePicker({
   value,
@@ -13,20 +13,15 @@ export function HikeDatePicker({
   onChange: (date: DateValue | null) => void;
   portalContainer?: HTMLElement | null;
 }) {
-  const minimumDate = today(getLocalTimeZone());
+  const minimumDate = today(getLocalTimeZone()).add({ days: 1 });
   const formattedDate = value
-    ? new Intl.DateTimeFormat(undefined, { dateStyle: 'full' }).format(
+    ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(
         new Date(value.year, value.month - 1, value.day),
       )
     : null;
 
   return (
-    <div className="flex max-w-[58%] items-center justify-end gap-1.5">
-      {formattedDate && (
-        <span className="text-right text-xs font-semibold leading-4 text-[#17342e] dark:text-[#b9d8c2]">
-          {formattedDate}
-        </span>
-      )}
+    <div className="shrink-0">
       <DatePicker value={value} onChange={onChange} minValue={minimumDate} className="w-auto">
         <Label className="sr-only">Hike date</Label>
         <DateField.Group className="!inline-flex !h-8 !w-8 !min-w-0 !overflow-visible !rounded-full !border-0 !bg-transparent !p-0 !shadow-none">
@@ -34,12 +29,26 @@ export function HikeDatePicker({
             {(segment) => <DateField.Segment segment={segment} />}
           </DateField.Input>
           <DateField.Suffix className="!m-0 !p-0">
-            <DatePicker.Trigger
-              aria-label={formattedDate ? `Change hike date, ${formattedDate}` : 'Choose hike date'}
-              className="!inline-grid !size-8 !shrink-0 !place-items-center !rounded-full !bg-transparent !p-0 text-[#17342e] transition-colors hover:!bg-[#17342e]/10 dark:text-[#b9d8c2] dark:hover:!bg-white/10"
-            >
-              <CalendarDays className="size-4" aria-hidden="true" />
-            </DatePicker.Trigger>
+            <Tooltip delay={0}>
+              <DatePicker.Trigger
+                aria-label={
+                  formattedDate ? `Change hike date, ${formattedDate}` : 'Choose hike date'
+                }
+                className="!inline-grid !size-8 !shrink-0 !place-items-center !rounded-full !border-0 !bg-[#e8ece9] !p-0 !text-[#5b6b60] transition-colors hover:!bg-[#1d604c] hover:!text-white dark:!bg-white/10 dark:!text-white/70 dark:hover:!bg-[#1d604c] dark:hover:!text-white"
+              >
+                <CalendarIcon pack="filled" className="size-4" aria-hidden="true" />
+              </DatePicker.Trigger>
+              <Tooltip.Content
+                className="z-[100] whitespace-nowrap"
+                UNSTABLE_portalContainer={portalContainer ?? undefined}
+                showArrow
+                placement="top"
+                offset={8}
+              >
+                <Tooltip.Arrow />
+                <p>Schedule date</p>
+              </Tooltip.Content>
+            </Tooltip>
           </DateField.Suffix>
         </DateField.Group>
         <DatePicker.Popover

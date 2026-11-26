@@ -14,7 +14,7 @@ import {
 import type { TrailmateConnection } from '@/features/trailmates/api/trailmates.hooks';
 
 import type { HikeDraft, HikeDraftErrors } from '../lib/hike-draft';
-import { getInitials, getLocalDateTimeMinimum } from '../lib/hike-post-composer-utils';
+import { getInitials, getLocalDateMinimum } from '../lib/hike-post-composer-utils';
 
 export function HikePostMetadata({
   draft,
@@ -42,12 +42,6 @@ export function HikePostMetadata({
     update('selectedMemberIds', Array.from(selected));
   };
 
-  const setScheduledAt = (value: string) => {
-    const [date = '', time = ''] = value.split('T');
-    update('date', date);
-    update('time', time);
-  };
-
   return (
     <>
       <div className="grid gap-2 border-y border-[#edf0ec] py-3 dark:border-white/10 sm:grid-cols-[minmax(0,1fr)_220px_auto] sm:items-start">
@@ -73,11 +67,11 @@ export function HikePostMetadata({
             aria-hidden="true"
           />
           <input
-            type="datetime-local"
-            aria-label="Hike date and time"
-            value={draft.date && draft.time ? `${draft.date}T${draft.time}` : ''}
-            min={getLocalDateTimeMinimum()}
-            onChange={(event) => setScheduledAt(event.target.value)}
+            type="date"
+            aria-label="Hike date"
+            value={draft.date}
+            min={getLocalDateMinimum()}
+            onChange={(event) => update('date', event.target.value)}
             aria-invalid={!!errors.date}
             className="h-10 w-full min-w-0 rounded-[8px] border border-[#d8e2d9] bg-white pl-9 pr-2 text-xs text-[#203a2e] outline-none transition focus:border-[#1d604c] focus:ring-2 focus:ring-[#1d604c]/15 aria-invalid:border-[#b64e34] dark:border-white/15 dark:bg-[#10231f] dark:text-white"
           />

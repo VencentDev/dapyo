@@ -7,7 +7,6 @@ import {
   CalendarDays,
   Check,
   ChevronLeft,
-  Clock3,
   MapPin,
   Mountain,
   Ruler,
@@ -137,6 +136,8 @@ export function HikeDetailPageContent({ hikeId }: { hikeId: string }) {
 
   const signInHref = `/login?callbackUrl=${encodeURIComponent(callbackPath)}`;
   const fullGroupSize = 1 + hike.joinedMemberCount + hike.externalGuestCount;
+  const guestNames = hike.externalGuestNames ?? [];
+  const unnamedGuestCount = Math.max(0, hike.externalGuestCount - guestNames.length);
 
   return (
     <section className="min-w-0 space-y-5 xl:col-span-2" aria-labelledby="hike-title">
@@ -201,10 +202,7 @@ export function HikeDetailPageContent({ hikeId }: { hikeId: string }) {
 
           <div className="mt-6 grid gap-3 border-y border-[#edf0ec] py-5 dark:border-white/10 sm:grid-cols-2">
             <Info icon={CalendarDays} label="Date">
-              {formatDate(hike.scheduledStartAt)}
-            </Info>
-            <Info icon={Clock3} label="Start time">
-              {formatTime(hike.scheduledStartAt)}
+              {formatDate(hike.scheduledDate)}
             </Info>
             <Info icon={Mountain} label="Difficulty">
               {formatDifficulty(hike.difficulty)}
@@ -269,6 +267,14 @@ export function HikeDetailPageContent({ hikeId }: { hikeId: string }) {
                   displayName={person.displayName}
                 />
               ))}
+              {guestNames.map((displayName, index) => (
+                <GuestCard key={`${displayName}-${index}`} displayName={displayName} />
+              ))}
+              {unnamedGuestCount > 0 && (
+                <GuestCard
+                  displayName={`${unnamedGuestCount} unnamed ${unnamedGuestCount === 1 ? 'guest' : 'guests'}`}
+                />
+              )}
             </ul>
           </section>
 
@@ -540,12 +546,30 @@ function PersonCard({
   );
 }
 
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(new Date(value));
+function GuestCard({ displayName }: { displayName: string }) {
+  return (
+    <li className="flex items-center gap-2.5 rounded-[8px] bg-[#f6f8f5] px-3 py-2.5 dark:bg-white/[0.05]">
+      <span className="grid size-8 place-items-center rounded-full bg-[#f2e8d8] text-[10px] font-bold text-[#8b653b] dark:bg-[#4b3928] dark:text-[#e8bd78]">
+        {displayName.trim().charAt(0).toUpperCase()}
+      </span>
+      <span className="min-w-0 flex-1 truncate text-xs font-medium text-[#354b3e] dark:text-white/80">
+        {displayName}
+      </span>
+      <span className="text-[9px] font-semibold uppercase tracking-wide text-[#9a7548] dark:text-[#e8bd78]">
+        Guest
+      </span>
+    </li>
+  );
 }
 
-function formatTime(value: string) {
-  return new Intl.DateTimeFormat(undefined, { timeStyle: 'short' }).format(new Date(value));
+function formatDate(value: string) {
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(value)
+    ? (() => {
+        const [year, month, day] = value.split('-').map(Number);
+        return new Date(year, month - 1, day);
+      })()
+    : new Date(value);
+  return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(date);
 }
 
 function formatDifficulty(value: string) {

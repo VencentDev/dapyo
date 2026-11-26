@@ -7,10 +7,8 @@ export function getInitials(name: string) {
     .join('');
 }
 
-export function getLocalDateTimeMinimum() {
+export function getLocalDateMinimum() {
   const now = new Date();
-  now.setMinutes(now.getMinutes() + 1, 0, 0);
-  const offset = now.getTimezoneOffset();
-  const local = new Date(now.getTime() - offset * 60_000);
-  return local.toISOString().slice(0, 16);
+  now.setDate(now.getDate() + 1);
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 }
