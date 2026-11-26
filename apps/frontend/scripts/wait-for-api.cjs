@@ -9,7 +9,10 @@ const apiBase =
   process.env.NEXT_PUBLIC_API_BASE_URL ??
   'http://localhost:8080';
 const healthUrl = new URL('/actuator/health', apiBase);
-const timeoutAt = Date.now() + 60_000;
+const configuredTimeoutMs = Number(process.env.DAPYO_API_READY_TIMEOUT_MS);
+const timeoutMs =
+  Number.isFinite(configuredTimeoutMs) && configuredTimeoutMs > 0 ? configuredTimeoutMs : 120_000;
+const timeoutAt = Date.now() + timeoutMs;
 const delay = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
 async function waitForApi() {
@@ -36,7 +39,7 @@ async function waitForApi() {
   }
 
   console.error(
-    `DAPYO API did not become ready within 60 seconds. Check that the backend is running and reachable at ${healthUrl.origin}.`,
+    `DAPYO API did not become ready within ${Math.ceil(timeoutMs / 1_000)} seconds. Check that the backend is running and reachable at ${healthUrl.origin}.`,
   );
   process.exitCode = 1;
 }
