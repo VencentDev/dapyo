@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { Mountain } from '@boxicons/react';
 
 import { CommunityHikeCard } from '@/features/home/feed/components/community-hike-card';
@@ -11,27 +10,7 @@ export function HomeFeedHikes() {
   const hikes = hikesQuery.data?.content ?? [];
 
   return (
-    <section aria-labelledby="community-hikes-heading" className="mt-6">
-      <div className="mb-3 flex items-center justify-between gap-3 px-1">
-        <div>
-          <h2
-            id="community-hikes-heading"
-            className="text-base font-semibold tracking-tight text-[#263d33] dark:text-[#edf4ef]"
-          >
-            Upcoming hikes
-          </h2>
-          <p className="mt-0.5 text-[10px] text-[#89968e] dark:text-white/50">
-            Plans shared by your hiking community
-          </p>
-        </div>
-        <Link
-          href="/discover"
-          className="shrink-0 rounded-sm text-xs font-semibold text-[#1d604c] hover:text-[#a77845] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d604c] dark:text-[#b9d8c2] dark:hover:text-[#e8bd78]"
-        >
-          Browse all
-        </Link>
-      </div>
-
+    <section aria-label="Upcoming community hikes" className="mt-6">
       {hikesQuery.isLoading ? (
         <div className="space-y-4" role="status" aria-label="Loading upcoming hikes">
           {[0, 1].map((item) => (

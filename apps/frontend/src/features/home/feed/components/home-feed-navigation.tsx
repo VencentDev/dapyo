@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import {
-  CalendarDays,
   ChevronLeft,
   ChevronRight,
   Compass,
@@ -21,7 +20,6 @@ import { HomeFeedAccountMenu } from '@/features/home/feed/components/home-feed-a
 const homeLinks = [
   { label: 'Home', href: '#feed', icon: Home },
   { label: 'Discover', href: '/discover', icon: Compass },
-  { label: 'My hikes', href: '#my-hikes', icon: CalendarDays },
   { label: 'Community', href: '#community', icon: Users },
   { label: 'Trailmates', href: '/trailmates', icon: HeartHandshake },
 ];
@@ -200,7 +198,7 @@ export function HomeFeedNavigation({
 
       <nav
         aria-label="Mobile navigation"
-        className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-6 border-t border-[#dfe6df] bg-white/95 px-2 pb-[env(safe-area-inset-bottom)] pt-2 shadow-[0_-8px_24px_rgba(16,35,31,.08)] backdrop-blur-xl dark:border-white/10 dark:bg-[#17342e]/95 lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-[#dfe6df] bg-white/95 px-2 pb-[env(safe-area-inset-bottom)] pt-2 shadow-[0_-8px_24px_rgba(16,35,31,.08)] backdrop-blur-xl dark:border-white/10 dark:bg-[#17342e]/95 lg:hidden"
       >
         {homeLinks.map(({ label, href, icon: Icon }) => (
           <Link
