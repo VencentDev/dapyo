@@ -4,7 +4,7 @@ import { HikeOrganizerLauncher } from '@/features/hikes/create/components/hike-o
 import { HomeFeedHikes } from '@/features/home/feed/components/home-feed-hikes';
 import { HomeFeedNavigation } from '@/features/home/feed/components/home-feed-navigation';
 import { HomeFeedSearch } from '@/features/home/feed/components/home-feed-search';
-import { HomeFeedSidebar } from '@/features/home/feed/components/home-feed-sidebar';
+import { HikeChatWorkspace } from '@/features/home/feed/components/hike-chat-workspace';
 
 export function HomeFeedContent({ displayName }: { displayName: string }) {
   const initials =
@@ -68,10 +68,7 @@ export function HomeFeedContent({ displayName }: { displayName: string }) {
 
           <HomeFeedHikes />
         </section>
-
-        <div className="lg:col-start-2 xl:col-auto">
-          <HomeFeedSidebar displayName={displayName} initials={initials} />
-        </div>
+        <HikeChatWorkspace />
       </HomeFeedNavigation>
     </main>
   );
