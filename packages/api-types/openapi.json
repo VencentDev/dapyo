@@ -1690,6 +1690,7 @@
           "senderId",
           "senderName",
           "sentByCurrentUser",
+          "messageType",
           "body",
           "sentAt"
         ],
@@ -1711,6 +1712,10 @@
           },
           "sentByCurrentUser": {
             "type": "boolean"
+          },
+          "messageType": {
+            "type": "string",
+            "enum": ["MESSAGE", "MEMBER_JOINED"]
           },
           "body": {
             "type": "string"

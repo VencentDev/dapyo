@@ -122,6 +122,7 @@ public class HikeChatServiceImpl implements HikeChatService {
         message.getSenderId(),
         senderName == null || senderName.isBlank() ? "Hiker" : senderName,
         message.getSenderId().equals(viewerId),
+        message.getMessageType(),
         message.getBody(),
         message.getCreatedAt());
   }

@@ -18,12 +18,15 @@ import com.vencentdev.backend.modules.hike.dto.HikeSummaryResponse;
 import com.vencentdev.backend.modules.hike.dto.HikeViewerStatus;
 import com.vencentdev.backend.modules.hike.dto.PublicHikerResponse;
 import com.vencentdev.backend.modules.hike.entity.Hike;
+import com.vencentdev.backend.modules.hike.entity.HikeMessage;
 import com.vencentdev.backend.modules.hike.entity.HikeParticipant;
 import com.vencentdev.backend.modules.hike.enums.HikeAdmissionMode;
+import com.vencentdev.backend.modules.hike.enums.HikeMessageType;
 import com.vencentdev.backend.modules.hike.enums.HikeParticipantStatus;
 import com.vencentdev.backend.modules.hike.enums.HikeStatus;
 import com.vencentdev.backend.modules.hike.repository.HikeImageRepository;
 import com.vencentdev.backend.modules.hike.repository.HikeLikeRepository;
+import com.vencentdev.backend.modules.hike.repository.HikeMessageRepository;
 import com.vencentdev.backend.modules.hike.repository.HikeParticipantRepository;
 import com.vencentdev.backend.modules.hike.repository.HikeRepository;
 import com.vencentdev.backend.modules.trailmates.service.TrailmateService;
@@ -57,6 +60,7 @@ public class HikeServiceImpl implements HikeService {
   private final HikeParticipantRepository participants;
   private final HikeImageRepository images;
   private final HikeLikeRepository likes;
+  private final HikeMessageRepository messages;
   private final UserRepository usersRepository;
   private final UserService users;
   private final TrailmateService trailmates;
@@ -66,6 +70,7 @@ public class HikeServiceImpl implements HikeService {
       HikeParticipantRepository participants,
       HikeImageRepository images,
       HikeLikeRepository likes,
+      HikeMessageRepository messages,
       UserRepository usersRepository,
       UserService users,
       TrailmateService trailmates) {
@@ -73,6 +78,7 @@ public class HikeServiceImpl implements HikeService {
     this.participants = participants;
     this.images = images;
     this.likes = likes;
+    this.messages = messages;
     this.usersRepository = usersRepository;
     this.users = users;
     this.trailmates = trailmates;
@@ -228,6 +234,9 @@ public class HikeServiceImpl implements HikeService {
       participant.setJoinedAt(nextStatus == HikeParticipantStatus.JOINED ? Instant.now() : null);
     }
     participants.save(participant);
+    if (nextStatus == HikeParticipantStatus.JOINED) {
+      recordMemberJoined(hike, userId);
+    }
     return toDetail(hike, userId);
   }
 
@@ -284,6 +293,7 @@ public class HikeServiceImpl implements HikeService {
     participant.setStatus(HikeParticipantStatus.JOINED);
     participant.setJoinedAt(Instant.now());
     participants.save(participant);
+    recordMemberJoined(hike, userId);
     return toDetail(hike, hike.getOrganizerId());
   }
 
@@ -310,7 +320,7 @@ public class HikeServiceImpl implements HikeService {
     if (organizerId.equals(request.userId())) {
       throw new BadRequestException("The organizer is already included in the group size");
     }
-    findUser(request.userId());
+    User member = findUser(request.userId());
     if (!trailmates.areAcceptedConnections(organizerId, Set.of(request.userId()))) {
       throw new BadRequestException("Only accepted Trailmates can be added to a hike");
     }
@@ -336,6 +346,7 @@ public class HikeServiceImpl implements HikeService {
       participant.setJoinedAt(Instant.now());
     }
     participants.save(participant);
+    recordMemberJoined(hike, member.getId());
     return toDetail(hike, organizerId);
   }
 
@@ -433,6 +444,16 @@ public class HikeServiceImpl implements HikeService {
 
   private HikeLikeResponse toLikeResponse(UUID hikeId, boolean likedByCurrentUser) {
     return new HikeLikeResponse(hikeId, likes.countByHikeId(hikeId), likedByCurrentUser);
+  }
+
+  private void recordMemberJoined(Hike hike, UUID userId) {
+    messages.save(
+        HikeMessage.builder()
+            .hikeId(hike.getId())
+            .senderId(userId)
+            .messageType(HikeMessageType.MEMBER_JOINED)
+            .body("joined the hike")
+            .build());
   }
 
   private UUID resolveViewerId(AuthenticatedUser principal) {
