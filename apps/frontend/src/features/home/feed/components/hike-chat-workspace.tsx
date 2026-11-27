@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
-import { MessageCircle, Mountain, SendAlt2, X } from '@boxicons/react';
+import Link from 'next/link';
+import { Maximize, MessageCircle, Mountain, SendAlt2, X } from '@boxicons/react';
 import { useSession } from 'next-auth/react';
+import { useTheme } from 'next-themes';
 
 import {
   useHikeChats,
@@ -13,6 +15,9 @@ import {
 
 export function HikeChatWorkspace() {
   const chatsQuery = useHikeChats();
+  const { resolvedTheme } = useTheme();
+  const messagesSurface =
+    resolvedTheme === undefined ? undefined : resolvedTheme === 'dark' ? '#17342e' : '#ffffff';
   const [activeChat, setActiveChat] = useState<HikeChatSummary | null>(null);
   const [isMobileListOpen, setIsMobileListOpen] = useState(false);
   const chats = chatsQuery.data ?? [];
@@ -25,7 +30,10 @@ export function HikeChatWorkspace() {
   return (
     <>
       <aside className="hidden min-w-0 xl:block" aria-label="Hike group messages">
-        <div className="dapyo-card-elevation sticky top-24 max-h-[calc(100svh-7rem)] overflow-hidden rounded-[8px] bg-white ring-1 ring-[#17342e]/[0.06] dark:bg-[#17342e] dark:ring-white/[0.08]">
+        <div
+          className="dapyo-card-elevation sticky top-4 h-[calc(100svh-2rem)] min-h-0 overflow-hidden rounded-[8px] border border-[#17342e]/10 bg-white shadow-[0_20px_60px_rgba(16,35,31,.14)] ring-1 ring-[#17342e]/[0.04] dark:border-white/[0.08] dark:bg-[#17342e] dark:ring-black/[0.04]"
+          style={{ backgroundColor: messagesSurface }}
+        >
           <ChatList
             chats={chats}
             isLoading={chatsQuery.isLoading}
@@ -33,6 +41,8 @@ export function HikeChatWorkspace() {
             selectedChatId={activeChat?.hikeId}
             onSelect={selectChat}
             onRetry={() => void chatsQuery.refetch()}
+            fillHeight
+            surfaceColor={messagesSurface}
           />
         </div>
       </aside>
@@ -47,6 +57,7 @@ export function HikeChatWorkspace() {
               selectedChatId={activeChat?.hikeId}
               onSelect={selectChat}
               onRetry={() => void chatsQuery.refetch()}
+              surfaceColor={messagesSurface}
             />
           </div>
         )}
@@ -62,7 +73,11 @@ export function HikeChatWorkspace() {
       </div>
 
       {activeChat && !isMobileListOpen && (
-        <HikeChatWindow chat={activeChat} onClose={() => setActiveChat(null)} />
+        <HikeChatWindow
+          chat={activeChat}
+          onClose={() => setActiveChat(null)}
+          surfaceColor={messagesSurface}
+        />
       )}
     </>
   );
@@ -75,6 +90,8 @@ function ChatList({
   selectedChatId,
   onSelect,
   onRetry,
+  fillHeight = false,
+  surfaceColor,
 }: {
   chats: HikeChatSummary[];
   isLoading: boolean;
@@ -82,17 +99,19 @@ function ChatList({
   selectedChatId?: string;
   onSelect: (chat: HikeChatSummary) => void;
   onRetry: () => void;
+  fillHeight?: boolean;
+  surfaceColor?: string;
 }) {
   return (
-    <section className="flex max-h-[65svh] min-h-48 flex-col bg-white dark:bg-[#17342e]">
+    <section
+      className={`flex flex-col bg-white text-[#17342e] dark:bg-[#17342e] dark:text-white ${fillHeight ? 'h-full min-h-0' : 'max-h-[65svh] min-h-48'}`}
+      style={{ backgroundColor: surfaceColor }}
+    >
       <header className="border-b border-[#edf0ec] px-4 py-4 dark:border-white/10">
         <div className="flex items-center gap-2 text-[#1d604c] dark:text-[#cde5d3]">
           <MessageCircle pack="filled" className="size-4" aria-hidden="true" />
           <h2 className="text-sm font-bold">Messages</h2>
         </div>
-        <p className="mt-1 text-[10px] leading-4 text-[#87948c] dark:text-white/50">
-          Group chats for hikes you organize or join.
-        </p>
       </header>
 
       {isLoading ? (
@@ -163,7 +182,17 @@ function ChatList({
   );
 }
 
-function HikeChatWindow({ chat, onClose }: { chat: HikeChatSummary; onClose: () => void }) {
+export function HikeChatWindow({
+  chat,
+  onClose,
+  surfaceColor,
+  presentation = 'floating',
+}: {
+  chat: HikeChatSummary;
+  onClose?: () => void;
+  surfaceColor?: string;
+  presentation?: 'floating' | 'page';
+}) {
   const { data: session } = useSession();
   const messagesQuery = useHikeChatMessages(chat.hikeId);
   const sendMessage = useSendHikeChatMessage();
@@ -201,11 +230,17 @@ function HikeChatWindow({ chat, onClose }: { chat: HikeChatSummary; onClose: () 
     }
   };
 
+  const windowClassName =
+    presentation === 'page'
+      ? 'dapyo-card-elevation flex h-[min(70rem,calc(100svh-9rem))] min-h-[28rem] w-full min-w-0 flex-col overflow-hidden rounded-[8px] border border-[#dce5dc] bg-white shadow-[0_20px_60px_rgba(16,35,31,.14)] dark:border-white/10 dark:bg-[#17342e]'
+      : 'dapyo-card-elevation fixed bottom-20 right-4 z-[60] flex h-[min(32rem,calc(100svh-7rem))] w-[min(23rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-[8px] border border-[#dce5dc] bg-white shadow-[0_20px_60px_rgba(16,35,31,.24)] dark:border-white/10 dark:bg-[#17342e] xl:bottom-4';
+
   return (
     <section
-      role="dialog"
+      role={presentation === 'floating' ? 'dialog' : undefined}
       aria-label={`${chat.name} group chat`}
-      className="dapyo-card-elevation fixed bottom-20 right-4 z-[60] flex h-[min(32rem,calc(100svh-7rem))] w-[min(23rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-[8px] border border-[#dce5dc] bg-white shadow-[0_20px_60px_rgba(16,35,31,.24)] dark:border-white/10 dark:bg-[#17342e] xl:bottom-4"
+      className={windowClassName}
+      style={{ backgroundColor: surfaceColor }}
     >
       <header className="flex shrink-0 items-center gap-2.5 border-b border-[#edf0ec] px-3.5 py-3 dark:border-white/10">
         <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[#eaf3eb] text-[#1d604c] dark:bg-white/[0.08] dark:text-[#cde5d3]">
@@ -216,17 +251,38 @@ function HikeChatWindow({ chat, onClose }: { chat: HikeChatSummary; onClose: () 
             {chat.name}
           </span>
           <span className="block truncate text-[10px] text-[#87948c] dark:text-white/50">
-            {chat.memberCount} {chat.memberCount === 1 ? 'member' : 'members'} · {chat.locationName}
+            {chat.memberCount} {chat.memberCount === 1 ? 'member' : 'members'}
           </span>
         </span>
-        <button
-          type="button"
-          aria-label="Close chat"
-          onClick={onClose}
-          className="grid size-8 shrink-0 place-items-center rounded-full text-[#718176] transition-colors hover:bg-[#f1f4f0] hover:text-[#1d604c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d604c]/40 dark:text-white/60 dark:hover:bg-white/[0.08] dark:hover:text-white"
-        >
-          <X pack="filled" className="size-4" aria-hidden="true" />
-        </button>
+        {presentation === 'floating' && (
+          <Link
+            href={`/hikes/${chat.hikeId}/chat`}
+            aria-label={`Open ${chat.name} chat as a page`}
+            title="Open full page"
+            className="grid size-8 shrink-0 place-items-center rounded-full text-[#718176] transition-colors hover:bg-[#f1f4f0] hover:text-[#1d604c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d604c]/40 dark:text-white/60 dark:hover:bg-white/[0.08] dark:hover:text-white"
+          >
+            <Maximize pack="filled" className="size-4" aria-hidden="true" />
+          </Link>
+        )}
+        {onClose ? (
+          <button
+            type="button"
+            aria-label="Close chat"
+            onClick={onClose}
+            className="grid size-8 shrink-0 place-items-center rounded-full text-[#718176] transition-colors hover:bg-[#f1f4f0] hover:text-[#1d604c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d604c]/40 dark:text-white/60 dark:hover:bg-white/[0.08] dark:hover:text-white"
+          >
+            <X pack="filled" className="size-4" aria-hidden="true" />
+          </button>
+        ) : (
+          <Link
+            href={`/hikes/${chat.hikeId}`}
+            aria-label="Return to hike details"
+            title="Return to hike details"
+            className="grid size-8 shrink-0 place-items-center rounded-full text-[#718176] transition-colors hover:bg-[#f1f4f0] hover:text-[#1d604c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d604c]/40 dark:text-white/60 dark:hover:bg-white/[0.08] dark:hover:text-white"
+          >
+            <X pack="filled" className="size-4" aria-hidden="true" />
+          </Link>
+        )}
       </header>
 
       <div
@@ -236,6 +292,7 @@ function HikeChatWindow({ chat, onClose }: { chat: HikeChatSummary; onClose: () 
             element.scrollHeight - element.scrollTop - element.clientHeight < 80;
         }}
         className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto bg-[#f8faf7] px-3 py-3 dark:bg-[#10231f]"
+        style={{ backgroundColor: surfaceColor }}
       >
         {messagesQuery.isLoading ? (
           <div className="space-y-2" role="status" aria-label="Loading messages">
@@ -256,29 +313,39 @@ function HikeChatWindow({ chat, onClose }: { chat: HikeChatSummary; onClose: () 
             </button>
           </div>
         ) : messages.length ? (
-          messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${message.sentByCurrentUser ? 'justify-end' : 'justify-start'}`}
-            >
-              <div
-                className={`max-w-[85%] rounded-[12px] px-3 py-2 ${message.sentByCurrentUser ? 'rounded-br-[4px] bg-[#1d604c] text-white' : 'rounded-bl-[4px] bg-white text-[#354b3e] shadow-sm dark:bg-white/[0.08] dark:text-white/85'}`}
-              >
-                {!message.sentByCurrentUser && (
-                  <p className="mb-1 text-[9px] font-semibold text-[#1d604c] dark:text-[#cde5d3]">
-                    {message.senderName}
-                  </p>
-                )}
-                <p className="whitespace-pre-wrap break-words text-xs leading-5">{message.body}</p>
-                <time
-                  dateTime={message.sentAt}
-                  className={`mt-1 block text-right text-[8px] ${message.sentByCurrentUser ? 'text-white/60' : 'text-[#9aa59e] dark:text-white/40'}`}
-                >
-                  {formatTime(message.sentAt)}
-                </time>
+          messages.map((message) =>
+            message.messageType === 'MEMBER_JOINED' ? (
+              <div key={message.id} className="flex justify-center py-1">
+                <span className="rounded-full bg-[#edf5ee] px-3 py-1.5 text-center text-[10px] font-medium text-[#31533f] dark:bg-white/[0.08] dark:text-white/70">
+                  {message.senderName} joined the hike
+                </span>
               </div>
-            </div>
-          ))
+            ) : (
+              <div
+                key={message.id}
+                className={`flex ${message.sentByCurrentUser ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-[85%] rounded-[12px] px-3 py-2 ${message.sentByCurrentUser ? 'rounded-br-[4px] bg-[#1d604c] text-white' : 'rounded-bl-[4px] bg-white text-[#354b3e] shadow-sm dark:bg-white/[0.08] dark:text-white/85'}`}
+                >
+                  {!message.sentByCurrentUser && (
+                    <p className="mb-1 text-[9px] font-semibold text-[#1d604c] dark:text-[#cde5d3]">
+                      {message.senderName}
+                    </p>
+                  )}
+                  <p className="whitespace-pre-wrap break-words text-xs leading-5">
+                    {message.body}
+                  </p>
+                  <time
+                    dateTime={message.sentAt}
+                    className={`mt-1 block text-right text-[8px] ${message.sentByCurrentUser ? 'text-white/60' : 'text-[#9aa59e] dark:text-white/40'}`}
+                  >
+                    {formatTime(message.sentAt)}
+                  </time>
+                </div>
+              </div>
+            ),
+          )
         ) : (
           <p className="m-auto max-w-56 text-center text-xs leading-5 text-[#87948c] dark:text-white/50">
             Say hello to your hike group and start planning together.
@@ -290,13 +357,17 @@ function HikeChatWindow({ chat, onClose }: { chat: HikeChatSummary; onClose: () 
       <form
         onSubmit={(event) => void handleSend(event)}
         className="shrink-0 border-t border-[#edf0ec] bg-white p-2.5 dark:border-white/10 dark:bg-[#17342e]"
+        style={{ backgroundColor: surfaceColor }}
       >
         {sendError && (
           <p role="alert" className="mb-2 px-1 text-[10px] text-[#8c3727] dark:text-[#ffb7a8]">
             {sendError}
           </p>
         )}
-        <div className="flex items-end gap-2 rounded-[8px] border border-[#dce5dc] bg-[#f8faf7] p-1.5 focus-within:border-[#1d604c] focus-within:ring-2 focus-within:ring-[#1d604c]/10 dark:border-white/10 dark:bg-[#10231f]">
+        <div
+          className="flex items-end gap-2 rounded-[8px] border border-[#dce5dc] bg-[#f8faf7] p-1.5 focus-within:border-[#1d604c] focus-within:ring-2 focus-within:ring-[#1d604c]/10 dark:border-white/10 dark:bg-[#10231f]"
+          style={{ backgroundColor: surfaceColor }}
+        >
           <textarea
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
