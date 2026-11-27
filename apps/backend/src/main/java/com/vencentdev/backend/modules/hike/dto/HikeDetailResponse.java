@@ -21,6 +21,8 @@ public record HikeDetailResponse(
     int joinedMemberCount,
     int externalGuestCount,
     List<String> externalGuestNames,
+    long likeCount,
+    boolean likedByCurrentUser,
     int availablePlaces,
     HikeAdmissionMode admissionMode,
     String description,

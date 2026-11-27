@@ -16,6 +16,7 @@ import {
   UserPlus,
   X,
 } from '@boxicons/react';
+import { Tooltip } from '@heroui/react';
 
 import { Dialog, DialogClose, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import {
@@ -43,7 +44,6 @@ export function CommunityHikeCard({ hike: summary }: { hike: HikeSummary }) {
   const totalGoing = 1 + summary.joinedMemberCount + summary.externalGuestCount;
   const featuredImage = hike?.images[0];
   const guestNames = hike?.externalGuestNames ?? [];
-  const unnamedGuestCount = Math.max(0, (hike?.externalGuestCount ?? 0) - guestNames.length);
   const isOrganizer = hike?.currentUserStatus === 'HOST';
   const hikers = hike
     ? ([
@@ -57,22 +57,8 @@ export function CommunityHikeCard({ hike: summary }: { hike: HikeSummary }) {
           name: person.displayName || 'DAPYO hiker',
           avatarUrl: person.avatarUrl,
         })),
-        ...guestNames.map((name, index) => ({
-          id: `guest-${index}-${name}`,
-          name,
-        })),
-        ...(unnamedGuestCount > 0
-          ? [
-              {
-                id: 'unnamed-guests',
-                name: `${unnamedGuestCount} unnamed ${unnamedGuestCount === 1 ? 'guest' : 'guests'}`,
-              },
-            ]
-          : []),
       ] satisfies HikerAvatar[])
     : [];
-  const visibleHikers = hikers.slice(0, 2);
-  const hiddenHikers = hikers.slice(2);
 
   return (
     <article className="dapyo-card-elevation overflow-hidden rounded-[8px] bg-white ring-1 ring-[#17342e]/[0.06] dark:bg-[#17342e] dark:ring-white/[0.08]">
@@ -93,11 +79,7 @@ export function CommunityHikeCard({ hike: summary }: { hike: HikeSummary }) {
             <div className="mt-1 flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1 rounded-full bg-[#eaf3eb] px-2.5 py-1 text-[10px] font-semibold text-[#1d604c] dark:bg-[#264536] dark:text-[#cde5d3]">
                 {summary.admissionMode === 'OPEN' ? (
-                  <Globe
-                    pack="filled"
-                    className="size-3 text-[#1d604c] dark:text-[#cde5d3]"
-                    aria-hidden="true"
-                  />
+                  <Globe pack="filled" className="size-3 text-[#1d604c]" aria-hidden="true" />
                 ) : (
                   <Lock
                     pack="filled"
@@ -208,7 +190,11 @@ export function CommunityHikeCard({ hike: summary }: { hike: HikeSummary }) {
             rating={summary.difficultyRating}
             label={formatDifficulty(summary.difficulty)}
           />
-          <WhoGoingSummary hikers={visibleHikers} hiddenHikers={hiddenHikers} />
+          <WhoGoingSummary
+            hikers={hikers}
+            guestCount={hike?.externalGuestCount ?? 0}
+            guestNames={guestNames}
+          />
         </dl>
 
         {hike?.requirements && (
@@ -228,6 +214,8 @@ export function CommunityHikeCard({ hike: summary }: { hike: HikeSummary }) {
           admissionMode={summary.admissionMode}
           hasOpenPlaces={hasOpenPlaces}
           isReady={Boolean(hike)}
+          likeCount={summary.likeCount}
+          likedByCurrentUser={summary.likedByCurrentUser}
         />
       </div>
 
@@ -320,27 +308,81 @@ function DifficultySummary({ rating, label }: { rating: number; label: string })
 
 function WhoGoingSummary({
   hikers,
-  hiddenHikers,
+  guestCount,
+  guestNames,
 }: {
   hikers: HikerAvatar[];
-  hiddenHikers: HikerAvatar[];
+  guestCount: number;
+  guestNames: string[];
 }) {
+  const visibleHikers = hikers.slice(0, 2);
+  const hiddenHikers = hikers.slice(2);
+  const unnamedGuestCount = Math.max(0, guestCount - guestNames.length);
+  const otherNames = [
+    ...hiddenHikers.map((person) => person.name),
+    ...guestNames,
+    ...Array.from(
+      { length: unnamedGuestCount },
+      (_, index) => `Guest ${guestNames.length + index + 1}`,
+    ),
+  ];
+  const otherCount = hiddenHikers.length + guestCount;
+
   return (
     <div className="min-w-0">
       <dt className="text-[10px] text-[#87948c] dark:text-white/50">Who’s going</dt>
       <dd className="mt-1 flex h-8 items-center">
         <div className="flex items-center -space-x-1.5 sm:-space-x-2">
-          {hikers.map((person) => (
-            <HikerAvatar key={person.id} person={person} />
+          {visibleHikers.map((person) => (
+            <Tooltip key={person.id} delay={0}>
+              <Tooltip.Trigger
+                role="img"
+                aria-label={`Hiker: ${person.name}`}
+                tabIndex={0}
+                className="relative grid size-6 shrink-0 place-items-center rounded-full focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d604c] sm:size-8"
+              >
+                <HikerAvatar person={person} />
+              </Tooltip.Trigger>
+              <Tooltip.Content
+                className="z-[100] max-w-64 whitespace-normal break-words"
+                showArrow
+                placement="top"
+                offset={8}
+              >
+                <Tooltip.Arrow />
+                <p>{person.name}</p>
+              </Tooltip.Content>
+            </Tooltip>
           ))}
-          {hiddenHikers.length > 0 && (
-            <span
-              title={hiddenHikers.map((person) => person.name).join(', ')}
-              aria-label={`${hiddenHikers.length} more hikers: ${hiddenHikers.map((person) => person.name).join(', ')}`}
-              className="relative grid size-6 place-items-center rounded-full border-2 border-white bg-[#eaf3eb] text-[9px] font-semibold text-[#1d604c] dark:border-[#17342e] dark:bg-[#31533f] dark:text-[#d1e2d6] sm:size-8 sm:text-[10px]"
-            >
-              +{hiddenHikers.length}
-            </span>
+          {otherCount > 0 && (
+            <Tooltip delay={0}>
+              <Tooltip.Trigger
+                role="img"
+                aria-label={`${otherCount} more hikers`}
+                tabIndex={0}
+                className="relative grid size-6 shrink-0 place-items-center rounded-full border-2 border-white bg-[#eaf3eb] text-[9px] font-semibold text-[#1d604c] focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d604c] dark:border-[#17342e] dark:bg-[#31533f] dark:text-[#d1e2d6] sm:size-8 sm:text-[10px]"
+              >
+                +{otherCount}
+              </Tooltip.Trigger>
+              <Tooltip.Content
+                className="z-[100] max-w-64 whitespace-normal break-words"
+                showArrow
+                placement="top"
+                offset={8}
+              >
+                <Tooltip.Arrow />
+                <div>
+                  <p className="mb-1 font-semibold">Also going</p>
+                  <ul className="space-y-0.5">
+                    {otherNames.map((name, index) => (
+                      <li key={`${index}-${name}`} className="break-words">
+                        {name}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </Tooltip.Content>
+            </Tooltip>
           )}
         </div>
       </dd>
@@ -350,12 +392,7 @@ function WhoGoingSummary({
 
 function HikerAvatar({ person }: { person: HikerAvatar }) {
   return (
-    <span
-      role="img"
-      aria-label={person.name}
-      title={person.name}
-      className="relative grid size-6 shrink-0 place-items-center overflow-hidden rounded-full border-2 border-white bg-[#dce9df] text-[9px] font-bold text-[#1d604c] dark:border-[#17342e] dark:bg-white/10 dark:text-[#dfece3] sm:size-8 sm:text-[10px]"
-    >
+    <span className="relative grid size-6 shrink-0 place-items-center overflow-hidden rounded-full border-2 border-white bg-[#dce9df] text-[9px] font-bold text-[#1d604c] dark:border-[#17342e] dark:bg-white/10 dark:text-[#dfece3] sm:size-8 sm:text-[10px]">
       {person.avatarUrl ? (
         <Image
           src={person.avatarUrl}

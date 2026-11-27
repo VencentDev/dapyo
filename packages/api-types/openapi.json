@@ -5,6 +5,31 @@
     "version": "0.0.1"
   },
   "paths": {
+    "/api/v1/hike-chats": {
+      "get": {
+        "operationId": "getHikeChats",
+        "responses": {
+          "200": {
+            "description": "Chats for hikes the current user organizes or has joined",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HikeChatSummaryResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/admin/ping": {
       "get": {
         "operationId": "adminPing",
@@ -583,6 +608,147 @@
             }
           }
         }
+      }
+    },
+    "/api/v1/hikes/{id}/likes": {
+      "post": {
+        "operationId": "likeHike",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Hike reaction updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HikeLikeResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "unlikeHike",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Hike reaction updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HikeLikeResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/hikes/{hikeId}/messages": {
+      "get": {
+        "operationId": "getHikeChatMessages",
+        "parameters": [
+          {
+            "name": "hikeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recent messages for the hike group chat",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HikeChatMessageResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "sendHikeChatMessage",
+        "parameters": [
+          {
+            "name": "hikeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HikeChatMessageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Message sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HikeChatMessageResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/v1/hikes/{id}/join": {
@@ -1463,6 +1629,98 @@
           }
         }
       },
+      "HikeLikeResponse": {
+        "type": "object",
+        "required": ["hikeId", "likeCount", "likedByCurrentUser"],
+        "properties": {
+          "hikeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "likeCount": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "likedByCurrentUser": {
+            "type": "boolean"
+          }
+        }
+      },
+      "HikeChatSummaryResponse": {
+        "type": "object",
+        "required": ["hikeId", "name", "locationName", "scheduledDate", "memberCount"],
+        "properties": {
+          "hikeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "locationName": {
+            "type": "string"
+          },
+          "scheduledDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "memberCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "HikeChatMessageRequest": {
+        "type": "object",
+        "required": ["body"],
+        "properties": {
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        }
+      },
+      "HikeChatMessageResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "hikeId",
+          "senderId",
+          "senderName",
+          "sentByCurrentUser",
+          "body",
+          "sentAt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "hikeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "senderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "senderName": {
+            "type": "string"
+          },
+          "sentByCurrentUser": {
+            "type": "boolean"
+          },
+          "body": {
+            "type": "string"
+          },
+          "sentAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "HikeSummaryResponse": {
         "type": "object",
         "required": [
@@ -1478,6 +1736,8 @@
           "maxParticipants",
           "joinedMemberCount",
           "externalGuestCount",
+          "likeCount",
+          "likedByCurrentUser",
           "availablePlaces",
           "admissionMode",
           "organizer"
@@ -1527,6 +1787,14 @@
             "type": "integer",
             "format": "int32"
           },
+          "likeCount": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "likedByCurrentUser": {
+            "type": "boolean"
+          },
           "availablePlaces": {
             "type": "integer",
             "format": "int32"
@@ -1555,6 +1823,8 @@
           "joinedMemberCount",
           "externalGuestCount",
           "externalGuestNames",
+          "likeCount",
+          "likedByCurrentUser",
           "availablePlaces",
           "admissionMode",
           "description",
@@ -1612,6 +1882,14 @@
             "items": {
               "type": "string"
             }
+          },
+          "likeCount": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "likedByCurrentUser": {
+            "type": "boolean"
           },
           "availablePlaces": {
             "type": "integer",

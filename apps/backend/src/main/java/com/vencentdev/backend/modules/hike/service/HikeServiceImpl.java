@@ -11,6 +11,7 @@ import com.vencentdev.backend.modules.hike.dto.HikeDetailResponse;
 import com.vencentdev.backend.modules.hike.dto.HikeGuestCountUpdateRequest;
 import com.vencentdev.backend.modules.hike.dto.HikeImageResponse;
 import com.vencentdev.backend.modules.hike.dto.HikeJoinRequestResponse;
+import com.vencentdev.backend.modules.hike.dto.HikeLikeResponse;
 import com.vencentdev.backend.modules.hike.dto.HikeMemberAddRequest;
 import com.vencentdev.backend.modules.hike.dto.HikeParticipantResponse;
 import com.vencentdev.backend.modules.hike.dto.HikeSummaryResponse;
@@ -22,6 +23,7 @@ import com.vencentdev.backend.modules.hike.enums.HikeAdmissionMode;
 import com.vencentdev.backend.modules.hike.enums.HikeParticipantStatus;
 import com.vencentdev.backend.modules.hike.enums.HikeStatus;
 import com.vencentdev.backend.modules.hike.repository.HikeImageRepository;
+import com.vencentdev.backend.modules.hike.repository.HikeLikeRepository;
 import com.vencentdev.backend.modules.hike.repository.HikeParticipantRepository;
 import com.vencentdev.backend.modules.hike.repository.HikeRepository;
 import com.vencentdev.backend.modules.trailmates.service.TrailmateService;
@@ -32,8 +34,11 @@ import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.StreamSupport;
@@ -51,6 +56,7 @@ public class HikeServiceImpl implements HikeService {
   private final HikeRepository hikes;
   private final HikeParticipantRepository participants;
   private final HikeImageRepository images;
+  private final HikeLikeRepository likes;
   private final UserRepository usersRepository;
   private final UserService users;
   private final TrailmateService trailmates;
@@ -59,12 +65,14 @@ public class HikeServiceImpl implements HikeService {
       HikeRepository hikes,
       HikeParticipantRepository participants,
       HikeImageRepository images,
+      HikeLikeRepository likes,
       UserRepository usersRepository,
       UserService users,
       TrailmateService trailmates) {
     this.hikes = hikes;
     this.participants = participants;
     this.images = images;
+    this.likes = likes;
     this.usersRepository = usersRepository;
     this.users = users;
     this.trailmates = trailmates;
@@ -148,24 +156,39 @@ public class HikeServiceImpl implements HikeService {
 
   @Override
   @Transactional(readOnly = true)
-  public PageResponse<HikeSummaryResponse> getUpcomingHikes(Pageable pageable) {
+  public PageResponse<HikeSummaryResponse> getUpcomingHikes(
+      Pageable pageable, AuthenticatedUser principal) {
     Pageable boundedPageable =
         PageRequest.of(pageable.getPageNumber(), Math.min(pageable.getPageSize(), 50));
     Page<Hike> page =
         hikes.findByStatusAndScheduledDateGreaterThanEqualOrderByScheduledDateAsc(
             HikeStatus.PUBLISHED, LocalDate.now(HIKES_ZONE), boundedPageable);
-    return PageResponse.from(page.map(this::toSummary));
+    List<UUID> hikeIds = page.getContent().stream().map(Hike::getId).toList();
+    Map<UUID, Long> likeCounts = new HashMap<>();
+    if (!hikeIds.isEmpty()) {
+      likes
+          .findLikeCountsByHikeIds(hikeIds)
+          .forEach(likeCount -> likeCounts.put(likeCount.getHikeId(), likeCount.getLikeCount()));
+    }
+    UUID viewerId = resolveViewerId(principal);
+    Set<UUID> likedHikeIds =
+        viewerId == null || hikeIds.isEmpty()
+            ? Set.of()
+            : new HashSet<>(likes.findLikedHikeIdsByUserIdAndHikeIdIn(viewerId, hikeIds));
+    return PageResponse.from(
+        page.map(
+            hike ->
+                toSummary(
+                    hike,
+                    likeCounts.getOrDefault(hike.getId(), 0L),
+                    likedHikeIds.contains(hike.getId()))));
   }
 
   @Override
   @Transactional(readOnly = true)
   public HikeDetailResponse getHike(UUID hikeId, AuthenticatedUser principal) {
     Hike hike = findPublishedHike(hikeId);
-    UUID viewerId =
-        principal == null
-            ? null
-            : usersRepository.findByExternalId(principal.subject()).map(User::getId).orElse(null);
-    return toDetail(hike, viewerId);
+    return toDetail(hike, resolveViewerId(principal));
   }
 
   @Override
@@ -206,6 +229,24 @@ public class HikeServiceImpl implements HikeService {
     }
     participants.save(participant);
     return toDetail(hike, userId);
+  }
+
+  @Override
+  @Transactional
+  public HikeLikeResponse likeHike(UUID hikeId, AuthenticatedUser principal) {
+    findPublishedHike(hikeId);
+    UUID userId = users.resolveInternalId(principal);
+    likes.insertIfAbsent(hikeId, userId);
+    return toLikeResponse(hikeId, true);
+  }
+
+  @Override
+  @Transactional
+  public HikeLikeResponse unlikeHike(UUID hikeId, AuthenticatedUser principal) {
+    findPublishedHike(hikeId);
+    UUID userId = users.resolveInternalId(principal);
+    likes.deleteByHikeIdAndUserId(hikeId, userId);
+    return toLikeResponse(hikeId, false);
   }
 
   @Override
@@ -315,7 +356,7 @@ public class HikeServiceImpl implements HikeService {
     return toDetail(hike, hike.getOrganizerId());
   }
 
-  private HikeSummaryResponse toSummary(Hike hike) {
+  private HikeSummaryResponse toSummary(Hike hike, long likeCount, boolean likedByCurrentUser) {
     int joined = joinedCount(hike.getId());
     return new HikeSummaryResponse(
         hike.getId(),
@@ -330,6 +371,8 @@ public class HikeServiceImpl implements HikeService {
         hike.getMaxParticipants(),
         joined,
         hike.getExternalGuestCount(),
+        likeCount,
+        likedByCurrentUser,
         availablePlaces(hike, joined),
         hike.getAdmissionMode(),
         toPublicHiker(findUser(hike.getOrganizerId())));
@@ -376,6 +419,8 @@ public class HikeServiceImpl implements HikeService {
         joinedCount,
         hike.getExternalGuestCount(),
         hike.getExternalGuestNames(),
+        likes.countByHikeId(hike.getId()),
+        viewerId != null && likes.existsByHikeIdAndUserId(hike.getId(), viewerId),
         availablePlaces(hike, joinedCount),
         hike.getAdmissionMode(),
         hike.getDescription(),
@@ -384,6 +429,16 @@ public class HikeServiceImpl implements HikeService {
         participantResponses,
         imageResponses,
         viewerStatus(hike, viewerId));
+  }
+
+  private HikeLikeResponse toLikeResponse(UUID hikeId, boolean likedByCurrentUser) {
+    return new HikeLikeResponse(hikeId, likes.countByHikeId(hikeId), likedByCurrentUser);
+  }
+
+  private UUID resolveViewerId(AuthenticatedUser principal) {
+    return principal == null
+        ? null
+        : usersRepository.findByExternalId(principal.subject()).map(User::getId).orElse(null);
   }
 
   private HikeViewerStatus viewerStatus(Hike hike, UUID viewerId) {
