@@ -69,7 +69,11 @@ export function CommunityHikeCardActions({
               title="Sign in to appreciate this hike"
               className="grid size-9 place-items-center rounded-full text-[#718176] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d604c]/40 hover:text-[#1d604c] dark:text-white/60 dark:hover:text-[#f0a04b]"
             >
-              <Heart pack="filled" className="size-5" aria-hidden="true" />
+              <Heart
+                pack="basic"
+                className="size-5 text-[#1d604c] dark:text-white/60"
+                aria-hidden="true"
+              />
             </Link>
           ) : (
             <button
@@ -81,8 +85,8 @@ export function CommunityHikeCardActions({
               className="grid size-9 place-items-center rounded-full text-[#718176] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d604c]/40 hover:text-[#1d604c] disabled:opacity-60 dark:text-white/60 dark:hover:text-[#f0a04b]"
             >
               <Heart
-                pack="filled"
-                className={`size-5 ${displayedLikedState ? 'text-[#1d604c] dark:text-[#f0a04b]' : ''}`}
+                pack={displayedLikedState ? 'filled' : 'basic'}
+                className={`size-5 ${displayedLikedState ? 'text-[#1d604c] dark:text-[#f0a04b]' : 'text-[#1d604c] dark:text-white/70'}`}
                 aria-hidden="true"
               />
             </button>
@@ -129,7 +133,10 @@ function JoinAction({
 
   if (sessionStatus === 'unauthenticated') {
     return (
-      <Button asChild className="min-h-10 bg-[#1d604c] px-4 text-white hover:bg-[#174c3d]">
+      <Button
+        asChild
+        className="min-h-10 rounded-full bg-[#1d604c] px-4 text-white hover:bg-[#174c3d]"
+      >
         <Link href={`/login?callbackUrl=${encodeURIComponent(`/hikes/${hikeId}`)}`}>
           Sign in to join
         </Link>
@@ -143,14 +150,16 @@ function JoinAction({
       type="button"
       disabled={!canSubmit || isPending}
       onClick={onJoin}
-      className="min-h-10 bg-[#1d604c] px-4 text-white hover:bg-[#174c3d]"
+      className="min-h-10 rounded-full bg-[#1d604c] px-4 text-white hover:bg-[#174c3d]"
     >
       {!isReady || sessionStatus === 'loading'
         ? 'Loading…'
         : !hasOpenPlaces
           ? 'Group is full'
           : isPending
-            ? 'Sending…'
+            ? admissionMode === 'OPEN'
+              ? 'Joining…'
+              : 'Requesting…'
             : admissionMode === 'OPEN'
               ? 'Join hike'
               : 'Request to join'}
