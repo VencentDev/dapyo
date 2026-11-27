@@ -12,6 +12,7 @@ export type HikeCreateRequest = components['schemas']['HikeCreateRequest'];
 export type HikeDetail = components['schemas']['HikeDetailResponse'];
 export type HikeSummary = components['schemas']['HikeSummaryResponse'];
 export type HikeImage = components['schemas']['HikeImageResponse'];
+export type HikeLikeResponse = components['schemas']['HikeLikeResponse'];
 
 type UpcomingHikes =
   paths['/api/v1/hikes']['get']['responses']['200']['content']['application/json'];
@@ -29,9 +30,13 @@ type AddMemberRequest = components['schemas']['HikeMemberAddRequest'];
 type UpdateGuestsRequest = components['schemas']['HikeGuestCountUpdateRequest'];
 
 export function useUpcomingHikes(page = 0, size = 20) {
+  const { data: session, status } = useSession();
+
   return useQuery({
-    queryKey: qk.upcomingHikes(page, size),
-    queryFn: () => clientApi<UpcomingHikes>(undefined, `/api/v1/hikes?page=${page}&size=${size}`),
+    queryKey: qk.upcomingHikes(page, size, session?.user?.id),
+    queryFn: () =>
+      clientApi<UpcomingHikes>(session?.accessToken, `/api/v1/hikes?page=${page}&size=${size}`),
+    enabled: status !== 'loading',
   });
 }
 
@@ -56,7 +61,10 @@ export function useCreateHike() {
         body: JSON.stringify(request),
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['upcoming-hikes'] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['upcoming-hikes'] }),
+        queryClient.invalidateQueries({ queryKey: qk.hikeChats(session?.user?.id) }),
+      ]);
     },
   });
 }
@@ -98,7 +106,56 @@ export function useJoinHike() {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: qk.hikePrefix(hike.id) }),
         queryClient.invalidateQueries({ queryKey: ['upcoming-hikes'] }),
+        queryClient.invalidateQueries({ queryKey: qk.hikeChats(session?.user?.id) }),
       ]);
+    },
+  });
+}
+
+export function useSetHikeLike() {
+  const { data: session } = useSession();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ hikeId, liked }: { hikeId: string; liked: boolean }) =>
+      clientApi<HikeLikeResponse>(session?.accessToken, `/api/v1/hikes/${hikeId}/likes`, {
+        method: liked ? 'POST' : 'DELETE',
+      }),
+    onSuccess: (reaction) => {
+      const currentViewerId = session?.user?.id ?? 'anonymous';
+      for (const [queryKey, current] of queryClient.getQueriesData<UpcomingHikes>({
+        queryKey: ['upcoming-hikes'],
+      })) {
+        if (!current) continue;
+        const isCurrentViewerCache = queryKey[3] === currentViewerId;
+        queryClient.setQueryData<UpcomingHikes>(queryKey, {
+          ...current,
+          content: current.content.map((hike) =>
+            hike.id === reaction.hikeId
+              ? {
+                  ...hike,
+                  likeCount: reaction.likeCount,
+                  likedByCurrentUser: isCurrentViewerCache
+                    ? reaction.likedByCurrentUser
+                    : hike.likedByCurrentUser,
+                }
+              : hike,
+          ),
+        });
+      }
+      for (const [queryKey, current] of queryClient.getQueriesData<HikeDetail>({
+        queryKey: qk.hikePrefix(reaction.hikeId),
+      })) {
+        if (!current) continue;
+        const isCurrentViewerCache = queryKey[2] === currentViewerId;
+        queryClient.setQueryData<HikeDetail>(queryKey, {
+          ...current,
+          likeCount: reaction.likeCount,
+          likedByCurrentUser: isCurrentViewerCache
+            ? reaction.likedByCurrentUser
+            : current.likedByCurrentUser,
+        });
+      }
     },
   });
 }
@@ -144,6 +201,7 @@ export function useRespondToHikeJoinRequest() {
         }),
         queryClient.invalidateQueries({ queryKey: qk.hikeJoinRequests(variables.hikeId) }),
         queryClient.invalidateQueries({ queryKey: ['upcoming-hikes'] }),
+        queryClient.invalidateQueries({ queryKey: qk.hikeChats(session?.user?.id) }),
       ]);
     },
   });
@@ -163,6 +221,7 @@ export function useAddHikeTrailmate() {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: qk.hikePrefix(hike.id) }),
         queryClient.invalidateQueries({ queryKey: ['upcoming-hikes'] }),
+        queryClient.invalidateQueries({ queryKey: qk.hikeChats(session?.user?.id) }),
       ]);
     },
   });

@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react';
 import { Heart } from '@boxicons/react';
 
 import { Button } from '@/components/ui/button';
-import { useJoinHike, type HikeSummary } from '@/features/hikes/api/hikes.hooks';
+import { useJoinHike, useSetHikeLike, type HikeSummary } from '@/features/hikes/api/hikes.hooks';
 import { ApiError } from '@/lib/api';
 
 export function CommunityHikeCardActions({
@@ -15,18 +15,28 @@ export function CommunityHikeCardActions({
   admissionMode,
   hasOpenPlaces,
   isReady,
+  likeCount,
+  likedByCurrentUser,
 }: {
   hikeId: string;
   status: string | null | undefined;
   admissionMode: HikeSummary['admissionMode'];
   hasOpenPlaces: boolean;
   isReady: boolean;
+  likeCount: number;
+  likedByCurrentUser: boolean;
 }) {
   const { status: sessionStatus } = useSession();
   const joinHike = useJoinHike();
-  const [isLiked, setIsLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
+  const setHikeLike = useSetHikeLike();
   const [joinError, setJoinError] = useState<string | null>(null);
+  const isLikePending = setHikeLike.isPending && setHikeLike.variables?.hikeId === hikeId;
+  const pendingLikeState = isLikePending ? setHikeLike.variables?.liked : undefined;
+  const displayedLikedState = pendingLikeState ?? likedByCurrentUser;
+  const displayedLikeCount = Math.max(
+    0,
+    likeCount + (displayedLikedState === likedByCurrentUser ? 0 : displayedLikedState ? 1 : -1),
+  );
 
   const handleJoin = async () => {
     setJoinError(null);
@@ -44,26 +54,44 @@ export function CommunityHikeCardActions({
           {joinError}
         </p>
       )}
+      {setHikeLike.isError && (
+        <p role="alert" className="mt-3 text-xs text-[#8c3727] dark:text-[#ffb7a8]">
+          Could not update your appreciation. Please try again.
+        </p>
+      )}
 
       <div className="mt-2 flex items-center justify-between gap-3 pt-2">
         <div className="inline-flex items-center gap-1.5 text-xs text-[#718176] dark:text-white/60">
-          <button
-            type="button"
-            aria-pressed={isLiked}
-            aria-label={isLiked ? 'Remove appreciation' : 'Appreciate this hike'}
-            onClick={() => {
-              setIsLiked(!isLiked);
-              setLikeCount((count) => count + (isLiked ? -1 : 1));
-            }}
-            className="grid size-9 place-items-center rounded-full text-[#718176] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d604c]/40 hover:text-[#1d604c] dark:text-white/60 dark:hover:text-[#f0a04b]"
-          >
-            <Heart
-              pack="filled"
-              className={`size-5 ${isLiked ? 'text-[#1d604c] dark:text-[#f0a04b]' : ''}`}
-              aria-hidden="true"
-            />
-          </button>
-          <span aria-live="polite">{likeCount}</span>
+          {sessionStatus === 'unauthenticated' ? (
+            <Link
+              href={`/login?callbackUrl=${encodeURIComponent('/home')}`}
+              aria-label="Sign in to appreciate this hike"
+              title="Sign in to appreciate this hike"
+              className="grid size-9 place-items-center rounded-full text-[#718176] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d604c]/40 hover:text-[#1d604c] dark:text-white/60 dark:hover:text-[#f0a04b]"
+            >
+              <Heart
+                pack="basic"
+                className="size-5 text-[#1d604c] dark:text-white/60"
+                aria-hidden="true"
+              />
+            </Link>
+          ) : (
+            <button
+              type="button"
+              aria-pressed={displayedLikedState}
+              aria-label={displayedLikedState ? 'Remove appreciation' : 'Appreciate this hike'}
+              disabled={sessionStatus !== 'authenticated' || isLikePending}
+              onClick={() => setHikeLike.mutate({ hikeId, liked: !likedByCurrentUser })}
+              className="grid size-9 place-items-center rounded-full text-[#718176] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d604c]/40 hover:text-[#1d604c] disabled:opacity-60 dark:text-white/60 dark:hover:text-[#f0a04b]"
+            >
+              <Heart
+                pack={displayedLikedState ? 'filled' : 'basic'}
+                className={`size-5 ${displayedLikedState ? 'text-[#1d604c] dark:text-[#f0a04b]' : 'text-[#1d604c] dark:text-white/70'}`}
+                aria-hidden="true"
+              />
+            </button>
+          )}
+          <span aria-live="polite">{displayedLikeCount}</span>
         </div>
         <JoinAction
           status={status}
@@ -105,7 +133,10 @@ function JoinAction({
 
   if (sessionStatus === 'unauthenticated') {
     return (
-      <Button asChild className="min-h-10 bg-[#1d604c] px-4 text-white hover:bg-[#174c3d]">
+      <Button
+        asChild
+        className="min-h-10 rounded-full bg-[#1d604c] px-4 text-white hover:bg-[#174c3d]"
+      >
         <Link href={`/login?callbackUrl=${encodeURIComponent(`/hikes/${hikeId}`)}`}>
           Sign in to join
         </Link>
@@ -119,14 +150,16 @@ function JoinAction({
       type="button"
       disabled={!canSubmit || isPending}
       onClick={onJoin}
-      className="min-h-10 bg-[#1d604c] px-4 text-white hover:bg-[#174c3d]"
+      className="min-h-10 rounded-full bg-[#1d604c] px-4 text-white hover:bg-[#174c3d]"
     >
       {!isReady || sessionStatus === 'loading'
         ? 'Loading…'
         : !hasOpenPlaces
           ? 'Group is full'
           : isPending
-            ? 'Sending…'
+            ? admissionMode === 'OPEN'
+              ? 'Joining…'
+              : 'Requesting…'
             : admissionMode === 'OPEN'
               ? 'Join hike'
               : 'Request to join'}

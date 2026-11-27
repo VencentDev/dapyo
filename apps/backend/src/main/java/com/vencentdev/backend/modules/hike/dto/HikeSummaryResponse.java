@@ -19,6 +19,8 @@ public record HikeSummaryResponse(
     int maxParticipants,
     int joinedMemberCount,
     int externalGuestCount,
+    long likeCount,
+    boolean likedByCurrentUser,
     int availablePlaces,
     HikeAdmissionMode admissionMode,
     PublicHikerResponse organizer) {}

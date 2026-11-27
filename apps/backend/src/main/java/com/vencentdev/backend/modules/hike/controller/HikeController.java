@@ -8,6 +8,7 @@ import com.vencentdev.backend.modules.hike.dto.HikeDetailResponse;
 import com.vencentdev.backend.modules.hike.dto.HikeGuestCountUpdateRequest;
 import com.vencentdev.backend.modules.hike.dto.HikeImageResponse;
 import com.vencentdev.backend.modules.hike.dto.HikeJoinRequestResponse;
+import com.vencentdev.backend.modules.hike.dto.HikeLikeResponse;
 import com.vencentdev.backend.modules.hike.dto.HikeMemberAddRequest;
 import com.vencentdev.backend.modules.hike.dto.HikeSummaryResponse;
 import com.vencentdev.backend.modules.hike.service.HikeImageDownload;
@@ -54,10 +55,11 @@ public class HikeController {
   @GetMapping
   public PageResponse<HikeSummaryResponse> getUpcomingHikes(
       @PageableDefault(size = 20, sort = "scheduledDate", direction = Sort.Direction.ASC)
-          Pageable pageable) {
+          Pageable pageable,
+      @CurrentUser AuthenticatedUser user) {
     int pageSize = Math.min(pageable.getPageSize(), MAX_PAGE_SIZE);
     Pageable boundedPageable = PageRequest.of(pageable.getPageNumber(), pageSize);
-    return hikes.getUpcomingHikes(boundedPageable);
+    return hikes.getUpcomingHikes(boundedPageable, user);
   }
 
   @PostMapping
@@ -75,6 +77,16 @@ public class HikeController {
   @PostMapping("/{id}/join")
   public HikeDetailResponse joinHike(@PathVariable UUID id, @CurrentUser AuthenticatedUser user) {
     return hikes.joinHike(id, user);
+  }
+
+  @PostMapping("/{id}/likes")
+  public HikeLikeResponse likeHike(@PathVariable UUID id, @CurrentUser AuthenticatedUser user) {
+    return hikes.likeHike(id, user);
+  }
+
+  @DeleteMapping("/{id}/likes")
+  public HikeLikeResponse unlikeHike(@PathVariable UUID id, @CurrentUser AuthenticatedUser user) {
+    return hikes.unlikeHike(id, user);
   }
 
   @GetMapping("/{id}/join-requests")
